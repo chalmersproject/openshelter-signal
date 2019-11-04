@@ -3,6 +3,8 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+.clang_comlete
+.gcc-flags.json
 
 #secrets SSIDs and passwds 
 include/credentials.h
