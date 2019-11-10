@@ -9,9 +9,9 @@
 -I/Users/chalmers/.platformio/packages/framework-arduinoespressif8266/libraries/DNSServer/src
 -I/Users/chalmers/.platformio/packages/framework-arduinoespressif8266/libraries/ESP8266HTTPClient/src
 -I/Users/chalmers/.platformio/packages/framework-arduinoespressif8266/libraries/ESP8266WiFi/src
+-I/Users/chalmers/Documents/Projects/MisterChalmers/chalmers-signal-occupancy/.pio/libdeps/esp12e/FastLED_ID126
 -I/Users/chalmers/Documents/Projects/MisterChalmers/chalmers-signal-occupancy/.pio/libdeps/esp12e/Adafruit ILI9341_ID571
 -I/Users/chalmers/Documents/Projects/MisterChalmers/chalmers-signal-occupancy/.pio/libdeps/esp12e/Adafruit GFX Library_ID13
--I/Users/chalmers/Documents/Projects/MisterChalmers/chalmers-signal-occupancy/.pio/libdeps/esp12e/FastLED_ID126
 -I/Users/chalmers/.platformio/packages/framework-arduinoespressif8266/libraries/SPI
 -I/Users/chalmers/.platformio/packages/framework-arduinoespressif8266/tools/sdk/include
 -I/Users/chalmers/.platformio/packages/framework-arduinoespressif8266/tools/sdk/libc/xtensa-lx106-elf/include

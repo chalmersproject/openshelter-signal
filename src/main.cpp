@@ -9,6 +9,7 @@
 #include "FirebaseESP8266.h"
 #include <ESP8266WiFi.h>
 
+
 //
 // !!!!!!!!!!! THIS FILE IS .gitignore'd !!!!!!!!!!!
 // it includes API keys SSIDs, and passwords
@@ -41,6 +42,8 @@ bool lgbtq_only = false;
 bool all_allowed = true;
 
 #include "json_test.h"
+#include "tft_test.h"
+
 
 void setup() {
   connect_Serial();
