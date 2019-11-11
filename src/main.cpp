@@ -51,7 +51,7 @@ void setup() {
   connect_Firebase();
 
   json_test();
-
+  tft_test();
 }
 
 void loop() {

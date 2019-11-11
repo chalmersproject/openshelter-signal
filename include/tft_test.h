@@ -1,5 +1,5 @@
-#define TFT_DC 9
-#define TFT_CS 10
+#define TFT_DC 4
+#define TFT_CS 5
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 String hello_world = "Hello World!";
 void tft_test()
@@ -12,4 +12,5 @@ void tft_test()
   tft.setTextSize(3);
   tft.println(hello_world);
   tft.drawLine(3, tft.height() /2 + 3, tft.width() - 3, tft.height() /2 + 3, ILI9341_RED);
+  tft.println(hello_world);
 }
