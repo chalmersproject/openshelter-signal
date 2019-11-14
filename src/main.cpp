@@ -2,7 +2,8 @@
 
 //display
 #include <SPI.h>
-#include <Adafruit_ILI9341.h>
+// #include <Adafruit_ILI9341.h>
+#include <TFT_ILI9163C.h>
 #include <Adafruit_GFX.h>
 
 //internet
@@ -47,10 +48,10 @@ bool all_allowed = true;
 
 void setup() {
   connect_Serial();
-  connect_Wifi();
-  connect_Firebase();
-
-  json_test();
+  // connect_Wifi();
+  // connect_Firebase();
+// 
+  // json_test();
   tft_test();
 }
 

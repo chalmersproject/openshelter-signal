@@ -1,16 +1,94 @@
-#define TFT_DC 4
-#define TFT_CS 5
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+
+// All wiring required, only 3 defines for hardware SPI on 328P
+#define __DC 0
+#define __CS 2
+// MOSI --> (SDA) --> D11
+// #define __RST 16
+// SCLK --> (SCK) --> D13
+
+// Color definitions
+#define	BLACK   0x0000
+#define	BLUE    0x001F
+#define	RED     0xF800
+#define	GREEN   0x07E0
+#define CYAN    0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW  0xFFE0  
+#define WHITE   0xFFFF
+
+TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
+// Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 String hello_world = "Hello World!";
+
+
+unsigned long testText() {
+  tft.fillScreen();
+  unsigned long start = micros();
+  tft.setCursor(0, 0);
+  tft.setTextColor(WHITE);  
+  tft.setTextSize(1);
+  tft.println("Hello World!");
+  tft.setTextColor(YELLOW); 
+  tft.setTextSize(2);
+  tft.println(1234.56);
+  tft.setTextColor(RED);    
+  tft.setTextSize(3);
+  tft.println(0xDEAD, HEX);
+  tft.println();
+  tft.setTextColor(GREEN);
+  tft.setTextSize(4);
+  tft.println("Hello");
+  return micros() - start;
+}
+
+unsigned long testLines(uint16_t color) {
+  tft.fillScreen();
+  unsigned long start, t;
+  int           x1, y1, x2, y2,
+  w = tft.width(),
+  h = tft.height();
+  tft.fillScreen();
+  x1 = y1 = 0;
+  y2    = h - 1;
+  start = micros();
+  for(x2=0; x2<w; x2+=6) tft.drawLine(x1, y1, x2, y2, color);
+  x2    = w - 1;
+  for(y2=0; y2<h; y2+=6) tft.drawLine(x1, y1, x2, y2, color);
+  t     = micros() - start; // fillScreen doesn't count against timing
+  tft.fillScreen();
+  x1    = w - 1;
+  y1    = 0;
+  y2    = h - 1;
+  start = micros();
+  for(x2=0; x2<w; x2+=6) tft.drawLine(x1, y1, x2, y2, color);
+  x2    = 0;
+  for(y2=0; y2<h; y2+=6) tft.drawLine(x1, y1, x2, y2, color);
+  t    += micros() - start;
+  tft.fillScreen();
+  x1    = 0;
+  y1    = h - 1;
+  y2    = 0;
+  start = micros();
+  for(x2=0; x2<w; x2+=6) tft.drawLine(x1, y1, x2, y2, color);
+  x2    = w - 1;
+  for(y2=0; y2<h; y2+=6) tft.drawLine(x1, y1, x2, y2, color);
+  t    += micros() - start;
+  tft.fillScreen();
+  x1    = w - 1;
+  y1    = h - 1;
+  y2    = 0;
+  start = micros();
+  for(x2=0; x2<w; x2+=6) tft.drawLine(x1, y1, x2, y2, color);
+  x2    = 0;
+  for(y2=0; y2<h; y2+=6) tft.drawLine(x1, y1, x2, y2, color);
+  return micros() - start;
+}
+
 void tft_test()
 {
-  tft.fillScreen(ILI9341_BLACK);
-  tft.setCursor(0, 0);
-
-  //text properties
-  tft.setTextColor(ILI9341_RED);
-  tft.setTextSize(3);
-  tft.println(hello_world);
-  tft.drawLine(3, tft.height() /2 + 3, tft.width() - 3, tft.height() /2 + 3, ILI9341_RED);
-  tft.println(hello_world);
+  tft.begin();
+  testLines(random(0x00ff,0xffff));
+  delay(100);
+  testText();
+  delay(500);
 }
