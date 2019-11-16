@@ -10,7 +10,7 @@
 -I/home/chalmers/.platformio/packages/framework-arduinoespressif8266/libraries/ESP8266HTTPClient/src
 -I/home/chalmers/.platformio/packages/framework-arduinoespressif8266/libraries/ESP8266WiFi/src
 -I/home/chalmers/Projects/MisterChalmers/chalmers-signal-occupancy/.pio/libdeps/esp12e/FastLED_ID126
--I/home/chalmers/Projects/MisterChalmers/chalmers-signal-occupancy/.pio/libdeps/esp12e/Adafruit ILI9341_ID571
+-I/home/chalmers/Projects/MisterChalmers/chalmers-signal-occupancy/.pio/libdeps/esp12e/TFT_ILI9163_ID546
 -I/home/chalmers/Projects/MisterChalmers/chalmers-signal-occupancy/.pio/libdeps/esp12e/Adafruit GFX Library_ID13
 -I/home/chalmers/.platformio/packages/framework-arduinoespressif8266/libraries/SPI
 -I/home/chalmers/.platformio/packages/framework-arduinoespressif8266/tools/sdk/include
@@ -19,6 +19,7 @@
 -I/home/chalmers/.platformio/packages/framework-arduinoespressif8266/tools/sdk/lwip2/include
 -I/home/chalmers/.platformio/packages/framework-arduinoespressif8266/variants/nodemcu
 -I/home/chalmers/.platformio/packages/framework-arduinoespressif8266/libraries/SoftwareSerial/src
+-I/home/chalmers/Projects/MisterChalmers/chalmers-signal-occupancy/.pio/libdeps/esp12e/Adafruit ILI9341_ID571
 -I/home/chalmers/.platformio/packages/framework-arduinoespressif8266/libraries/ArduinoOTA
 -I/home/chalmers/.platformio/packages/framework-arduinoespressif8266/libraries/EEPROM
 -I/home/chalmers/.platformio/packages/framework-arduinoespressif8266/libraries/ESP8266AVRISP/src

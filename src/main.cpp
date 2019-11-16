@@ -14,6 +14,8 @@
 //
 // !!!!!!!!!!! THIS FILE IS .gitignore'd !!!!!!!!!!!
 // it includes API keys SSIDs, and passwords
+// You need to fill it in with your own credentials
+// before this program will work.
 #include "credentials.h"
 
 //Define Firebase Data object
@@ -48,13 +50,20 @@ bool all_allowed = true;
 
 void setup() {
   connect_Serial();
-  // connect_Wifi();
-  // connect_Firebase();
-// 
-  // json_test();
+  connect_Wifi();
+  connect_Firebase();
+  json_test();
   tft_test();
+
+  //show connected on display!
+  tft.fillScreen();
+  tft.setCursor(0, 0);
+  tft.setTextColor(WHITE);
+  tft.setTextSize(1);
+  tft.println("Connected to Internet!");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+
 }
