@@ -20,9 +20,10 @@
 
 //Define Firebase Data object
 FirebaseData firebaseData;
+FirebaseJson json;
+FirebaseJsonObject jsonParseResult;
 
-//functions
-#include "connect.h"
+String path = "/Shelters/st_felix_augusta";
 
 
 //available space
@@ -44,23 +45,39 @@ bool female_only = false;
 bool lgbtq_only = false;
 bool all_allowed = true;
 
-#include "json_test.h"
+//functions
+#include "connect.h"
+#include "firebase_json.h"
 #include "tft_test.h"
-
+#include "check_status.h"
+#include "show_status.h"
 
 void setup() {
   connect_Serial();
   connect_Wifi();
   connect_Firebase();
-  json_test();
-  tft_test();
+  connect_TFT();
 
-  //show connected on display!
-  tft.fillScreen();
-  tft.setCursor(0, 0);
-  tft.setTextColor(WHITE);
-  tft.setTextSize(1);
-  tft.println("Connected to Internet!");
+  //instatiate the locally stored json object
+  //with properties defined above
+  //in firebase_json.h
+  set_local_json();
+
+  //if shelter doesn't exist in online database yet,
+  //push shelter info to database
+  // if(!(Firebase.getJSON(firebaseData, path)))
+  // {
+    // Firebase.setJSON(firebaseData, path, json);
+  // }
+  //else, if it does exist get the last shelter
+  //data pushed to the online database and write
+  //it to the locally stored json
+  // else{
+    // write_remote_json_to_local();
+  // }
+  write_remote_json_to_local();
+  show_display_status();
+  show_lights_status();
 }
 
 void loop() {

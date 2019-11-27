@@ -1,11 +1,11 @@
 
 /*
  * Created by K. Suwatchai (Mobizt)
- * 
+ *
  * Email: k_suwatchai@hotmail.com
- * 
+ *
  * Github: https://github.com/mobizt
- * 
+ *
  * Copyright (c) 2019 mobizt
  *
 */
@@ -50,7 +50,7 @@ void setup()
     String path = "/ESP8266_Test/Json";
 
     String jsonData = "";
-    
+
 
     FirebaseJson json;
     FirebaseJson json2;
@@ -69,7 +69,7 @@ void setup()
     json3.addDouble("myVal",212.224).addString("myStr","good");
 
     json4.setJsonData("{\"simpleData\":\"this is string\"}");//Manual set raw json string.
-   
+
 
     json.clear().addInt("data1",100).addArray("myArray",&jsonArr).addJson("anotherData",&json3).addJson("data2",&json4);
 
@@ -79,10 +79,10 @@ void setup()
     Serial.println("JSON Data");
     Serial.println(json.toString());
     Serial.println("------------------------------------");
-    
 
 
-   
+
+
     Serial.println("------------------------------------");
     Serial.println("Set JSON test...");
 
@@ -137,12 +137,12 @@ void setup()
         else if (firebaseData.dataType() == "string")
             Serial.println(firebaseData.stringData());
         else if (firebaseData.dataType() == "json"){
-           
+
            jsonData = firebaseData.jsonData(); //store for next test
            Serial.println(firebaseData.jsonData());
 
         }
-            
+
         Serial.println("------------------------------------");
         Serial.println();
     }
@@ -168,7 +168,7 @@ void setup()
 
       for (size_t i = 0; i < count; i++)
       {
-        
+
         json2.jsonObjectiterator(i,key,value);
         jsonParseResult = json2.parseResult();
 
@@ -176,10 +176,10 @@ void setup()
         Serial.print(key);
         Serial.print(", ");
         Serial.print("VALUE: ");
-        Serial.print(value); 
+        Serial.print(value);
         Serial.print(", ");
         Serial.print("TYPE: ");
-        Serial.println(jsonParseResult.type);        
+        Serial.println(jsonParseResult.type);
 
       }
 
@@ -190,13 +190,13 @@ void setup()
     Serial.println("------------------------------------");
     Serial.println("Parse for some child node...");
 
-    
-    json2.parse().get("anotherData").get("myVal");    
+
+    json2.parse().get("anotherData").get("myVal");
 
     jsonParseResult = json2.parseResult();
 
     if(jsonParseResult.success){
-     
+
       Serial.println("1. Parse json data result for node /anotherData/myVal");
       Serial.print("TYPE: ");
       Serial.println(jsonParseResult.type);
@@ -206,11 +206,11 @@ void setup()
 
     }else{
       Serial.println("1. Parse json data for node /anotherData/myVal was failed!");
-    } 
+    }
 
-    //Set parse with false to get data through all children nodes, 
+    //Set parse with false to get data through all children nodes,
     //otherwise this would be failed to get child node data because of it's under data2 node.
-    json2.parse(false).get("simpleData"); 
+    json2.parse(false).get("simpleData");
 
 
     jsonParseResult = json2.parseResult();
@@ -218,7 +218,7 @@ void setup()
     Serial.println();
 
     if(jsonParseResult.success){
-     
+
       Serial.println("2. Parse json data result for node /data2/simpleData with skipChild set to false");
       Serial.print("TYPE: ");
       Serial.println(jsonParseResult.type);
@@ -228,13 +228,12 @@ void setup()
 
     }else{
       Serial.println("2. Parse json data for node /data2/simpleData was failed!");
-    }    
+    }
 
 
 
     //Any json object inside array also can be accessed by set parse(false),
     //The next test will ignore it and the result was failed as expected.
-    json2.parse().get("test2"); 
 
 
     jsonParseResult = json2.parseResult();
@@ -242,7 +241,7 @@ void setup()
     Serial.println();
 
     if(jsonParseResult.success){
-     
+
       Serial.println("3. Parse json data result for node /myArray/test2 with skipChild set to true, or ignored");
       Serial.print("TYPE: ");
       Serial.println(jsonParseResult.type);
@@ -252,8 +251,8 @@ void setup()
 
     }else{
       Serial.println("3. Parse json data for node /myArray/test2 was failed as expected!");
-    }     
-        
+    }
+
      Serial.println("------------------------------------");
      Serial.println();
 
