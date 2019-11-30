@@ -1,3 +1,7 @@
+FirebaseData firebaseData;
+FirebaseJson json;
+FirebaseJsonObject jsonParseResult;
+
 String jsonData = "";
 FirebaseJson testJson;
 FirebaseJson Firecode_Space;

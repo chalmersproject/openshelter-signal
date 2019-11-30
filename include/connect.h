@@ -40,4 +40,6 @@ void connect_TFT()
   #define WHITE   0xFFFF
 
   TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
+  tft.begin();
 }
+
