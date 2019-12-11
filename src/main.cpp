@@ -49,41 +49,76 @@ bool all_allowed = true;
 void setup() {
   connect_Serial();
   Serial.println("Start Chalmers Signal!");
-  
+
+  /*
   connect_TFT();
+
+  //Internet stuff
   show_chalmers_start();
-  
+
   connect_Wifi();
   show_wifi_connected();
   delay(500);
+  */
+  connect_Wifi();
+  delay(500);
+
+  set_local_json();
+  json.parse().get("Service_Status").get("Firecode_Space").get("Firecode_Occupancy");
+  firecode_occupancy = json.parseResult().intValue;
+
+  Serial.print("Firecode Occupancy: ");
+  Serial.println(firecode_occupancy);
 
   connect_Firebase();
+  pull_remote_json();
+  write_remote_json_to_local();
+  /*
+  connect_Firebase();
+  pull_remote_json();
+  write_remote_json_to_local();
   show_chalmers_start();
 
   //instatiate the locally stored json object
   //with properties defined above
   //in firebase_json.h
-  // set_local_json();
+  set_local_json();
 
-  //if shelter doesn't exist in online database yet,
-  //push shelter info to database
-  // if(!(Firebase.getJSON(firebaseData, path)))
-  // {
+  //if shelter info already exists in firebase, pull the data
+  //and write it to local firebase json object
+  if((Firebase.getJSON(firebaseData, path)))
+  {
     // Firebase.setJSON(firebaseData, path, json);
-  // }
-  //else, if it does exist get the last shelter
-  //data pushed to the online database and write
-  //it to the locally stored json
-  // else{
-    // write_remote_json_to_local();
-  // }
-  // tft_test();
-  // write_remote_json_to_local();
-  
-  // show_lights_status();
+    Serial.println("Writing remote json to local json");
+    pull_remote_json();
+    write_remote_json_to_local();
+  }
+  //else, if data isn't in firebase yet
+  //instatiate the local json object and write it out
+  //to firebase
+  else{
+    //
+    set_local_json();
+  }
+
+  tft_test();
+  write_remote_json_to_local();
+  show_lights_status();
+  */
 }
 
 void loop() {
+  /*
   // put your main code here, to run repeatedly:
-
+  if(check_dial_change() == 1)
+  {
+    firecode_occupancy++;
+    update_tft_occupancy(firecode_occupancy);
+  }
+  else if(check_dial_change() == -1)
+  {
+    firecode_occupancy--;
+    update_tft_occupancy(firecode_occupancy);
+  }
+  */
 }

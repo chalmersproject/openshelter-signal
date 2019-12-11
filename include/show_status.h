@@ -23,3 +23,13 @@ void show_lights_status()
 {
 
 }
+
+void update_tft_occupancy(int occupancy)
+{
+
+}
+
+void update_led_occupancy(int occupancy)
+{
+
+}

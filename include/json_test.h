@@ -122,7 +122,7 @@ json.clear().addInt("data1",100).addArray("myArray",&jsonArr).addJson("anotherDa
 
       testJson.clear().setJsonData(jsonData);
       testJson.parse();
-      size_t count =testJson.getJsonObjectIteratorCount();
+      size_t count = testJson.getJsonObjectIteratorCount();
       String key;
       String value;
 
