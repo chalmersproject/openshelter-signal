@@ -67,12 +67,28 @@ void setup() {
   json.parse().get("Service_Status").get("Firecode_Space").get("Firecode_Occupancy");
   firecode_occupancy = json.parseResult().intValue;
 
+  Serial.println("===================");
+  Serial.println("Initialized Json Value");
+  Serial.println("===================");
   Serial.print("Firecode Occupancy: ");
   Serial.println(firecode_occupancy);
 
+  Serial.println("===================");
+  Serial.println("Connectecting to Firebase and pulling remote json");
+  Serial.println("===================");
   connect_Firebase();
   pull_remote_json();
   write_remote_json_to_local();
+
+  //write local json to local variable
+  json.parse().get("Service_Status").get("Firecode_Space").get("Firecode_Occupancy");
+
+  Serial.println("===================");
+  Serial.println("Pulled JSON Value written to local variable");
+  Serial.println("===================");
+  Serial.print("Firecode Occupancy: ");
+  Serial.println(firecode_occupancy);
+
   /*
   connect_Firebase();
   pull_remote_json();
