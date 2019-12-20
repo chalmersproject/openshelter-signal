@@ -1,9 +1,3 @@
-FirebaseData firebaseData;
-FirebaseJson json;
-FirebaseJsonObject jsonParseResult;
-
-String jsonData = "";
-FirebaseJson testJson;
 
 void set_local_json()
 {
@@ -34,42 +28,31 @@ void pull_remote_json()
 {
   if (Firebase.getJSON(firebaseData, path))
   {
-      Serial.println("PASSED");
-      Serial.println("PATH: " + firebaseData.dataPath());
-      Serial.println("TYPE: " + firebaseData.dataType());
-      Serial.print("VALUE: ");
-      if (firebaseData.dataType() == "int")
-          Serial.println(firebaseData.intData());
-      else if (firebaseData.dataType() == "float")
-          Serial.println(firebaseData.floatData(), 5);
-      else if (firebaseData.dataType() == "double")
-          printf("%.9lf\n", firebaseData.doubleData());
-      else if (firebaseData.dataType() == "boolean")
-          Serial.println(firebaseData.boolData() == 1 ? "true" : "false");
-      else if (firebaseData.dataType() == "string")
-          Serial.println(firebaseData.stringData());
-      else if (firebaseData.dataType() == "json"){
-
-         jsonData = firebaseData.jsonData(); //store for next test
-         Serial.println(firebaseData.jsonData());
-
-      }
+    if (firebaseData.dataType() == "json"){
+      jsonData = firebaseData.jsonData();
+    }
+    else
+    {
+      Serial.println("Some fuckin error writing remote json data to local");\
+      Serial.println("REASON: " + firebaseData.errorReason());
       Serial.println("------------------------------------");
       Serial.println();
-  }
-  else
+    }
+  }else
   {
-      Serial.println("FAILED");
+      Serial.println("Some fuckin error writing remote json data to local");\
       Serial.println("REASON: " + firebaseData.errorReason());
       Serial.println("------------------------------------");
       Serial.println();
   }
+  
 }
 
 void write_remote_json_to_local()
 {
   Serial.println("Clear local JSON");
   json.clear().setJsonData(jsonData);
+  // json.setJsonData(jsonData);
   json.parse();
   size_t count = json.getJsonObjectIteratorCount();
   String key;

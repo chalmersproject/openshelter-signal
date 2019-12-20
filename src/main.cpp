@@ -19,6 +19,15 @@
 //////////////////////////////////////////////////////////
 //                Shelter Properties                    //
 //////////////////////////////////////////////////////////
+
+//json objects
+FirebaseData firebaseData;
+FirebaseJson json;
+FirebaseJsonObject jsonParseResult;
+
+String jsonData = "";
+FirebaseJson testJson;
+
 String path = "/Shelters/st_felix_augusta";
 //available space
 int firecode_capacity = 100;
@@ -52,9 +61,10 @@ void setup() {
 
   /*
   connect_TFT();
+  show_chalmers_start();
 
   //Internet stuff
-  show_chalmers_start();
+  
 
   connect_Wifi();
   show_wifi_connected();
@@ -63,31 +73,58 @@ void setup() {
   connect_Wifi();
   delay(500);
 
+  // firecode_occupancy = 0;
+  // Serial.println("===================");
+  // Serial.println("Initialized Firecode Occupancy to 0");
+  // Serial.println("===================");
+  // Serial.print("Firecode Occupancy: ");
+  // Serial.println(firecode_occupancy);
+  // Serial.println("");
+  // Serial.println("");
+
   set_local_json();
   json.parse().get("Service_Status").get("Firecode_Space").get("Firecode_Occupancy");
   firecode_occupancy = json.parseResult().intValue;
 
+
+  
   Serial.println("===================");
   Serial.println("Initialized Json Value");
   Serial.println("===================");
   Serial.print("Firecode Occupancy: ");
   Serial.println(firecode_occupancy);
+  Serial.println("");
+  Serial.println("");
+
 
   Serial.println("===================");
   Serial.println("Connectecting to Firebase and pulling remote json");
   Serial.println("===================");
+  Serial.println("");
+  Serial.println("");
+  
   connect_Firebase();
   pull_remote_json();
   write_remote_json_to_local();
 
   //write local json to local variable
   json.parse().get("Service_Status").get("Firecode_Space").get("Firecode_Occupancy");
+  if (jsonParseResult.type == "int")
+  {
+    Serial.println("it is an int!");
+  }
+  else {
+    Serial.println("it's not an int, fucked up");
+  }
+  // firecode_occupancy = json.parseResult().intValue;
 
   Serial.println("===================");
   Serial.println("Pulled JSON Value written to local variable");
   Serial.println("===================");
   Serial.print("Firecode Occupancy: ");
   Serial.println(firecode_occupancy);
+  Serial.println("");
+  Serial.println("");
 
   /*
   connect_Firebase();
