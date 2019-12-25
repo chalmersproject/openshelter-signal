@@ -1,10 +1,10 @@
 /*
  * Created by K. Suwatchai (Mobizt)
- * 
+ *
  * Email: k_suwatchai@hotmail.com
- * 
+ *
  * Github: https://github.com/mobizt
- * 
+ *
  * Copyright (c) 2019 mobizt
  *
 */
@@ -105,7 +105,7 @@ void setup()
 
 void loop()
 {
-  
+
   if (millis() - sendDataPrevMillis > 15000)
   {
     sendDataPrevMillis = millis();
@@ -164,10 +164,10 @@ void printJsonObjectContent(FirebaseData &data){
     Serial.print(key);
     Serial.print(", ");
     Serial.print("VALUE: ");
-    Serial.print(value); 
+    Serial.print(value);
     Serial.print(", ");
     Serial.print("TYPE: ");
-    Serial.println(jsonParseResult.type);        
+    Serial.println(jsonParseResult.type);
 
   }
 }
@@ -186,11 +186,9 @@ void printJsonObjectContent2(StreamData &data){
     Serial.print(key);
     Serial.print(", ");
     Serial.print("VALUE: ");
-    Serial.print(value); 
+    Serial.print(value);
     Serial.print(", ");
     Serial.print("TYPE: ");
-    Serial.println(jsonParseResult.type);        
-
+    Serial.println(jsonParseResult.type);
   }
 }
-

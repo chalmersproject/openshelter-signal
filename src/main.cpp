@@ -1,4 +1,7 @@
+#define _GLIBCXX_USE_C99 1
 #include <Arduino.h>
+// #include <iostream>
+// #include <string>
 
 //display
 #include <SPI.h>
@@ -55,6 +58,7 @@ bool all_allowed = true;
 #include "check_status.h"
 #include "show_status.h"
 
+String _string;
 void setup() {
   connect_Serial();
   Serial.println("Start Chalmers Signal!");
@@ -64,7 +68,7 @@ void setup() {
   show_chalmers_start();
 
   //Internet stuff
-  
+
 
   connect_Wifi();
   show_wifi_connected();
@@ -87,7 +91,7 @@ void setup() {
   firecode_occupancy = json.parseResult().intValue;
 
 
-  
+
   Serial.println("===================");
   Serial.println("Initialized Json Value");
   Serial.println("===================");
@@ -102,20 +106,15 @@ void setup() {
   Serial.println("===================");
   Serial.println("");
   Serial.println("");
-  
+
   connect_Firebase();
   pull_remote_json();
   write_remote_json_to_local();
 
   //write local json to local variable
-  json.parse().get("Service_Status").get("Firecode_Space").get("Firecode_Occupancy");
-  if (jsonParseResult.type == "int")
-  {
-    Serial.println("it is an int!");
-  }
-  else {
-    Serial.println("it's not an int, fucked up");
-  }
+  // json.parse().get("Service_Status").get("Firecode_Space").get("Firecode_Occupancy").getValue();
+
+  Serial.println(Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy) );
   // firecode_occupancy = json.parseResult().intValue;
 
   Serial.println("===================");
