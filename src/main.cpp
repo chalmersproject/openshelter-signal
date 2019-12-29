@@ -80,8 +80,9 @@ void setup() {
   //pull the last shelter occupancy pushed to firebase
   else
   {
-    Serial.println("Pulling last known occupancy for " + path + " : ");
-    Serial.print(Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy) );
+    Serial.print("Pulling last known occupancy for " + path + " : ");
+    Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
+    Serial.println(firecode_occupancy);
   }
 }
 
