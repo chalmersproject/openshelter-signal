@@ -58,105 +58,31 @@ bool all_allowed = true;
 #include "check_status.h"
 #include "show_status.h"
 
-String _string;
 void setup() {
   connect_Serial();
   Serial.println("Start Chalmers Signal!");
 
-  /*
-  connect_TFT();
-  show_chalmers_start();
-
-  //Internet stuff
-
-
-  connect_Wifi();
-  show_wifi_connected();
-  delay(500);
-  */
   connect_Wifi();
   delay(500);
 
-  // firecode_occupancy = 0;
-  // Serial.println("===================");
-  // Serial.println("Initialized Firecode Occupancy to 0");
-  // Serial.println("===================");
-  // Serial.print("Firecode Occupancy: ");
-  // Serial.println(firecode_occupancy);
-  // Serial.println("");
-  // Serial.println("");
-
-  set_local_json();
-  json.parse().get("Service_Status").get("Firecode_Space").get("Firecode_Occupancy");
-  firecode_occupancy = json.parseResult().intValue;
-
-
-
-  Serial.println("===================");
-  Serial.println("Initialized Json Value");
-  Serial.println("===================");
-  Serial.print("Firecode Occupancy: ");
-  Serial.println(firecode_occupancy);
-  Serial.println("");
-  Serial.println("");
-
-
-  Serial.println("===================");
-  Serial.println("Connectecting to Firebase and pulling remote json");
-  Serial.println("===================");
-  Serial.println("");
-  Serial.println("");
-
   connect_Firebase();
-  pull_remote_json();
-  write_remote_json_to_local();
 
-  //write local json to local variable
-  // json.parse().get("Service_Status").get("Firecode_Space").get("Firecode_Occupancy").getValue();
-
-  Serial.println(Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy) );
-  // firecode_occupancy = json.parseResult().intValue;
-
-  Serial.println("===================");
-  Serial.println("Pulled JSON Value written to local variable");
-  Serial.println("===================");
-  Serial.print("Firecode Occupancy: ");
-  Serial.println(firecode_occupancy);
-  Serial.println("");
-  Serial.println("");
-
-  /*
-  connect_Firebase();
-  pull_remote_json();
-  write_remote_json_to_local();
-  show_chalmers_start();
-
-  //instatiate the locally stored json object
-  //with properties defined above
-  //in firebase_json.h
-  set_local_json();
-
-  //if shelter info already exists in firebase, pull the data
-  //and write it to local firebase json object
-  if((Firebase.getJSON(firebaseData, path)))
+  //if shelter info does not already exist in firebase
+  //create a json object at shelter path and push to firebase
+  if( !Firebase.getJSON(firebaseData, path) )
   {
-    // Firebase.setJSON(firebaseData, path, json);
-    Serial.println("Writing remote json to local json");
-    pull_remote_json();
-    write_remote_json_to_local();
-  }
-  //else, if data isn't in firebase yet
-  //instatiate the local json object and write it out
-  //to firebase
-  else{
-    //
+    Serial.println("Shelter data does not exist in firebase!");
+    Serial.println("Creating Shelter data and pushing to firebase!");
     set_local_json();
+    write_local_to_remote();
   }
-
-  tft_test();
-  write_remote_json_to_local();
-  show_lights_status();
-  */
+  //else if shelter data is already in firebase
+  //pull the last shelter occupancy pushed to firebase
+  else
+  {
+    Serial.println("Pulling last known occupancy for " + path + " : ");
+    Serial.print(Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy) );
+  }
 }
 
 void loop() {

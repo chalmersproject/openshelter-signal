@@ -24,6 +24,24 @@ void set_local_json()
   json.addJson("Service_Status", &Service_Status).addJson("Client_Properties", &Client_Properties);
 }
 
+void write_local_to_remote()
+{
+  if (Firebase.setJSON(firebaseData, path, json))
+  {
+      Serial.println("PASSED local json pushed to firebase!");
+      Serial.println("PATH: " + firebaseData.dataPath());
+      Serial.println("TYPE: " + firebaseData.dataType());
+      Serial.println("------------------------------------");
+      Serial.println();
+  }
+  else
+  {
+      Serial.println("FAILED push local json to firebase!");
+      Serial.println("REASON: " + firebaseData.errorReason());
+      Serial.println("------------------------------------");
+      Serial.println();
+  }
+}
 void pull_remote_json()
 {
   if (Firebase.getJSON(firebaseData, path))
@@ -45,7 +63,7 @@ void pull_remote_json()
       Serial.println("------------------------------------");
       Serial.println();
   }
-  
+
 }
 
 void write_remote_json_to_local()
