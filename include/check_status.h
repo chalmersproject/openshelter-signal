@@ -1,8 +1,9 @@
-#define dial_pin 16
+int dial_pin = 15;
 int dial_value, current_value, last_value;
 int val_1 = 300;
 int val_2 = 600;
 int val_3 = 900;
+
 int find_dial_values()
 {
   dial_value = analogRead(dial_pin);
@@ -28,6 +29,7 @@ int find_dial_values()
     return -2;
   }
 }
+
 
 int check_dial_change()
 {

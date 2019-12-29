@@ -61,6 +61,7 @@ bool all_allowed = true;
 void setup() {
   connect_Serial();
   Serial.println("Start Chalmers Signal!");
+  pinMode(dial_pin, INPUT);
 
   connect_Wifi();
   delay(500);
@@ -86,7 +87,11 @@ void setup() {
   }
 }
 
+int dial_pin_value;
 void loop() {
+  dial_pin_value = analogRead(dial_pin);
+  delay(300);
+  Serial.println("Dial pin analog read : " + dial_pin_value);
   /*
   // put your main code here, to run repeatedly:
   if(check_dial_change() == 1)
