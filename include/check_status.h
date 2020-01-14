@@ -1,4 +1,4 @@
-int dial_pin = 15;
+const int dial_pin = A0;
 int dial_value, current_value, last_value;
 int val_1 = 300;
 int val_2 = 600;
