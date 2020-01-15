@@ -93,6 +93,12 @@ void loop() {
   dial_return_value = check_dial_change();
   Serial.print("Up or down? ::::");
   Serial.println(dial_return_value);
+  firecode_occupancy += dial_return_value;
+  Serial.print("firecode occupancy: ");
+  Serial.println(firecode_occupancy);
+  Serial.println();
+  Serial.println();
+  Serial.println();
   delay(500);
   /*
   // put your main code here, to run repeatedly:
