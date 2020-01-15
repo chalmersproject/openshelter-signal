@@ -88,10 +88,12 @@ void setup() {
 }
 
 int dial_pin_value;
+int dial_return_value;
 void loop() {
-  dial_pin_value = analogRead(dial_pin);
-  delay(300);
-  Serial.println("Dial pin analog read : " + dial_pin_value);
+  dial_return_value = check_dial_change();
+  Serial.print("Up or down? ::::");
+  Serial.println(dial_return_value);
+  delay(500);
   /*
   // put your main code here, to run repeatedly:
   if(check_dial_change() == 1)
