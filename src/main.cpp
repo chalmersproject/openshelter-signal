@@ -32,6 +32,7 @@ String jsonData = "";
 FirebaseJson testJson;
 
 String path = "/Shelters/st_felix_augusta";
+String path_firecode_occupancy = "/Shelters/st_felix_augusta/Service_Status/Firecode_Space/Firecode_Occupancy";
 //available space
 int firecode_capacity = 100;
 int bed_capacity      = 43;
@@ -89,28 +90,46 @@ void setup() {
 
 int dial_pin_value;
 int dial_return_value;
+int last_firecode_occupancy = firecode_occupancy;
+bool there_is_a_change_to_push = false;
+uint32_t now;
+uint32_t last;
+uint32_t last_pull;
+
 void loop() {
+  now = millis();
+
   dial_return_value = check_dial_change();
-  Serial.print("Up or down? ::::");
-  Serial.println(dial_return_value);
   firecode_occupancy += dial_return_value;
-  Serial.print("firecode occupancy: ");
-  Serial.println(firecode_occupancy);
-  Serial.println();
-  Serial.println();
-  Serial.println();
-  delay(500);
-  /*
-  // put your main code here, to run repeatedly:
-  if(check_dial_change() == 1)
+
+  //if firecode occupancy has changed
+  if (firecode_occupancy != last_firecode_occupancy)
   {
-    firecode_occupancy++;
-    update_tft_occupancy(firecode_occupancy);
+    //update display, then delay pushing to firebase by 600 milliseconds
+    //by resetting last to now
+    //set the "change to push" boolean to true
+    update_tft_occupancy(firecode_occupancy, firecode_capacity);
+    last = now;
+    there_is_a_change_to_push = true;
+  } //else if no change don't bother pushing to firebase
+
+
+  //only push to firebase if there is a change to push and it has been
+  //at least 600 milliseconds since the last change
+  //so to avoid pushing a million times when the dial is turned
+  //a whole bunch of times during an update by the user
+  if ( (now - last >= 600) && there_is_a_change_to_push ){
+    Firebase.pushInt(firebaseData, path_firecode_occupancy, firecode_occupancy);
+uint32_t last;
+    there_is_a_change_to_push = false;
+    last = now;
+    last_pull = now;
   }
-  else if(check_dial_change() == -1)
+
+  // if there hasn't been a change pushed in the last 2 seconds
+  // pull the latest from firebase
+  if ( now - last_pull >= 2000 )
   {
-    firecode_occupancy--;
-    update_tft_occupancy(firecode_occupancy);
+    Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
   }
-  */
 }
