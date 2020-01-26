@@ -66,7 +66,7 @@ void setup() {
 
   connect_Wifi();
   delay(500);
-
+  connect_TFT();
   connect_Firebase();
 
   //if shelter info does not already exist in firebase
@@ -108,11 +108,13 @@ void loop() {
     //update display, then delay pushing to firebase by 600 milliseconds
     //by resetting last to now
     //set the "change to push" boolean to true
-    update_tft_occupancy(firecode_occupancy, firecode_capacity);
+    // update_tft_occupancy(firecode_occupancy, firecode_capacity);
+    Serial.print("Firecode_Occupancy: ");
+    Serial.println(firecode_occupancy);
     last = now;
     there_is_a_change_to_push = true;
-  } //else if no change don't bother pushing to firebase
-
+    update_tft_occupancy(firecode_occupancy, firecode_occupancy);
+  }
 
   //only push to firebase if there is a change to push and it has been
   //at least 600 milliseconds since the last change
@@ -120,7 +122,7 @@ void loop() {
   //a whole bunch of times during an update by the user
   if ( (now - last >= 600) && there_is_a_change_to_push ){
     Firebase.pushInt(firebaseData, path_firecode_occupancy, firecode_occupancy);
-uint32_t last;
+
     there_is_a_change_to_push = false;
     last = now;
     last_pull = now;
