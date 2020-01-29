@@ -98,7 +98,7 @@ uint32_t last_pull;
 
 void loop() {
   now = millis();
-
+last_firecode_occupancy = firecode_occupancy;
   dial_return_value = check_dial_change();
   firecode_occupancy += dial_return_value;
 
@@ -112,15 +112,16 @@ void loop() {
     Serial.print("Firecode_Occupancy: ");
     Serial.println(firecode_occupancy);
     last = now;
+    last_firecode_occupancy = firecode_occupancy;
     there_is_a_change_to_push = true;
-    update_tft_occupancy(firecode_occupancy, firecode_occupancy);
+    update_tft_occupancy(firecode_occupancy, firecode_capacity);
   }
 
   //only push to firebase if there is a change to push and it has been
   //at least 600 milliseconds since the last change
   //so to avoid pushing a million times when the dial is turned
   //a whole bunch of times during an update by the user
-  if ( (now - last >= 600) && there_is_a_change_to_push ){
+  if ( (now - last >= 1000) && there_is_a_change_to_push ){
     Firebase.pushInt(firebaseData, path_firecode_occupancy, firecode_occupancy);
 
     there_is_a_change_to_push = false;
