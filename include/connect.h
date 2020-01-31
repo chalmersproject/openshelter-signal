@@ -4,20 +4,20 @@ void connect_Serial(){
     Serial.println();
 }
 
-void connect_Wifi(){
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    Serial.print("Connecting to Wi-Fi");
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        Serial.print(".");
-        delay(300);
-    }
-    Serial.println();
-    Serial.print("Connected with IP: ");
-    Serial.println(WiFi.localIP());
-    Serial.println();
-}
-
+// void connect_Wifi(){
+//     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+//     Serial.print("Connecting to Wi-Fi");
+//     while (WiFi.status() != WL_CONNECTED)
+//     {
+//         Serial.print(".");
+//         delay(300);
+//     }
+//     Serial.println();
+//     Serial.print("Connected with IP: ");
+//     Serial.println(WiFi.localIP());
+//     Serial.println();
+// }
+//
 void connect_Firebase(){
     Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
     Firebase.reconnectWiFi(true);
@@ -42,4 +42,3 @@ void connect_TFT()
   TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
   tft.begin();
 }
-

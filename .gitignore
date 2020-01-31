@@ -6,5 +6,6 @@
 .clang_complete
 .gcc-flags.json
 
-#secrets SSIDs and passwds 
+#secrets SSIDs and passwds
 include/credentials.h
+

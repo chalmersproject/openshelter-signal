@@ -1,4 +1,4 @@
-#define _GLIBCXX_USE_C99 1
+// #define _GLIBCXX_USE_C99 1
 #include <Arduino.h>
 // #include <iostream>
 // #include <string>
@@ -11,7 +11,7 @@
 
 //internet
 #include "FirebaseESP8266.h"
-#include <ESP8266WiFi.h>
+// #include <ESP8266WiFi.h>
 
 // !!!!!!!!!!! THIS FILE IS .gitignore'd !!!!!!!!!!!
 // it includes API keys SSIDs, and passwords
@@ -64,10 +64,10 @@ void setup() {
   Serial.println("Start Chalmers Signal!");
   pinMode(dial_pin, INPUT);
 
-  connect_Wifi();
+  // connect_Wifi();
   delay(500);
   connect_TFT();
-  connect_Firebase();
+  // connect_Firebase();
 
   //if shelter info does not already exist in firebase
   //create a json object at shelter path and push to firebase
@@ -76,14 +76,14 @@ void setup() {
     Serial.println("Shelter data does not exist in firebase!");
     Serial.println("Creating Shelter data and pushing to firebase!");
     set_local_json();
-    write_local_to_remote();
+    // write_local_to_remote();
   }
   //else if shelter data is already in firebase
   //pull the last shelter occupancy pushed to firebase
   else
   {
     Serial.print("Pulling last known occupancy for " + path + " : ");
-    Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
+    // Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
     Serial.println(firecode_occupancy);
   }
 }
@@ -122,7 +122,7 @@ last_firecode_occupancy = firecode_occupancy;
   //so to avoid pushing a million times when the dial is turned
   //a whole bunch of times during an update by the user
   if ( (now - last >= 1000) && there_is_a_change_to_push ){
-    Firebase.pushInt(firebaseData, path_firecode_occupancy, firecode_occupancy);
+    // Firebase.pushInt(firebaseData, path_firecode_occupancy, firecode_occupancy);
 
     there_is_a_change_to_push = false;
     last = now;
@@ -133,6 +133,6 @@ last_firecode_occupancy = firecode_occupancy;
   // pull the latest from firebase
   if ( now - last_pull >= 2000 )
   {
-    Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
+    // Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
   }
 }
