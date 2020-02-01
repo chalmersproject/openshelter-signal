@@ -8,10 +8,7 @@ uint32_t last_dial_check = 0;
 
 int check_dial_change()
 {
-  dial_value = analogRead(dial_pin);
-  mapped_value = map(dial_value, val_1, val_2, 0, 10);
-
-  if (now - last_dial_check >= 1000)
+  if (now - last_dial_check >= 300)
   {
     Serial.println("----------------------");
     Serial.println("----------------------");
@@ -21,8 +18,25 @@ int check_dial_change()
     Serial.println(mapped_value);
     Serial.println("----------------------");
     Serial.println("----------------------");
+    Serial.println("");
+    Serial.println("");
 
     last_dial_check = now;
+  }
+
+  dial_value = analogRead(dial_pin);
+  mapped_value = map(dial_value, val_1, val_2, 0, 5);
+  // if mapped_value resolves to some value other than the known discrete dial values
+  // then analogRead was probably run while the dial was between positions and pin A0's
+  // PWM resolved something between the last dial position and the next dial position
+  //
+  // therefore set mapped_value to the last recoorded value
+  if(mapped_value != 0 && mapped_value != 1 && mapped_value !=5)
+  {
+    Serial.println("mapped_value came out to something strange!");
+    Serial.print("Mapped Value: ");
+    Serial.println(mapped_value);
+    mapped_value = current_value; //at this point current_value is actually the last recorded value, not last_value
   }
 
   last_value = current_value;
@@ -32,15 +46,15 @@ int check_dial_change()
   {
     return 0;
   }
-  else if (last_value == 0 && current_value == 2)
+  else if (last_value == 0 && current_value == 1)
   {
     return 1;
   }
-  else if (last_value == 2 && current_value == 10)
+  else if (last_value == 1 && current_value == 5)
   {
     return 1;
   }
-  else if (last_value == 10 && current_value == 0)
+  else if (last_value == 5 && current_value == 0)
   {
     return 1;
   }

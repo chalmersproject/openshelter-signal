@@ -56,10 +56,12 @@ bool all_allowed = true;
 int dial_pin_value;
 int dial_return_value;
 int last_firecode_occupancy = firecode_occupancy;
+int last_last_firecode_occupancy = firecode_occupancy;
 bool there_is_a_change_to_push = false;
 uint32_t now;
 uint32_t last;
 uint32_t last_pull;
+uint32_t last_dial_change;
 
 //Utilities
 #include "connect.h"
@@ -97,6 +99,7 @@ void setup() {
     // Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
     Serial.println(firecode_occupancy);
   }
+  update_tft_occupancy(firecode_occupancy, firecode_capacity);
 }
 
 
@@ -104,9 +107,17 @@ void setup() {
 void loop() {
   now = millis();
   last_firecode_occupancy = firecode_occupancy;
-
+  last_last_firecode_occupancy = last_firecode_occupancy;
   dial_return_value = check_dial_change();
   firecode_occupancy += dial_return_value;
+
+  if (firecode_occupancy < last_firecode_occupancy && last_firecode_occupancy < last_last_firecode_occupancy)
+  {
+    Serial.println("");
+    Serial.println("Bug above!");
+    delay(10000);
+
+  }
 
   //if firecode occupancy has changed
   if (firecode_occupancy != last_firecode_occupancy)
@@ -119,10 +130,21 @@ void loop() {
     Serial.println(firecode_occupancy);
     last = now;
     last_firecode_occupancy = firecode_occupancy;
+    last_last_firecode_occupancy = last_firecode_occupancy;
     there_is_a_change_to_push = true;
-    update_tft_occupancy(firecode_occupancy, firecode_capacity);
+    last_dial_change = now;
   }
 
+  // because updating the display introduces a delay that can be longer than the
+  // amount of time between dial position changes during a quick turning of the dial
+  // the tft display will only be updated if it's been 100 milliseconds since the last
+  // time the dial has been moved
+  if(now - last_dial_change >= 200 && there_is_a_change_to_push == true)
+  {
+    update_tft_occupancy(firecode_occupancy, firecode_capacity);
+    last_dial_change = now;
+    there_is_a_change_to_push = false;
+  }
   //only push to firebase if there is a change to push and it has been
   //at least 600 milliseconds since the last change
   //so to avoid pushing a million times when the dial is turned
