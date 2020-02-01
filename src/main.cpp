@@ -137,14 +137,15 @@ void loop() {
 
   // because updating the display introduces a delay that can be longer than the
   // amount of time between dial position changes during a quick turning of the dial
-  // the tft display will only be updated if it's been 100 milliseconds since the last
+  // the tft display will only be updated if it's been 240 milliseconds since the last
   // time the dial has been moved
-  if(now - last_dial_change >= 200 && there_is_a_change_to_push == true)
+  if(now - last_dial_change >= 240 && there_is_a_change_to_push == true)
   {
     update_tft_occupancy(firecode_occupancy, firecode_capacity);
     last_dial_change = now;
     there_is_a_change_to_push = false;
   }
+
   //only push to firebase if there is a change to push and it has been
   //at least 600 milliseconds since the last change
   //so to avoid pushing a million times when the dial is turned
