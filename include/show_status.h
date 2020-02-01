@@ -27,13 +27,13 @@ void show_lights_status()
 void update_tft_occupancy(int occupancy, int capacity)
 {
   tft.fillScreen();
-  tft.setCursor(50, 30);
+  tft.setCursor(35, 10);
   tft.setTextColor(WHITE);
-  tft.setTextSize(3);
+  tft.setTextSize(5);
   tft.println(occupancy);
-  tft.setCursor(30, 55);
+  tft.setCursor(8, 42);
   tft.println("----");
-  tft.setCursor(40, 80);
+  tft.setCursor(20, 75);
   tft.println(capacity);
 }
 

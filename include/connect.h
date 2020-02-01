@@ -42,3 +42,8 @@ void connect_TFT()
   TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
   tft.begin();
 }
+
+void connect_LED()
+{
+  #define LED_PIN D0
+}
