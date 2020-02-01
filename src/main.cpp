@@ -52,12 +52,23 @@ bool female_only = false;
 bool lgbtq_only = false;
 bool all_allowed = true;
 
+//Global Variables
+int dial_pin_value;
+int dial_return_value;
+int last_firecode_occupancy = firecode_occupancy;
+bool there_is_a_change_to_push = false;
+uint32_t now;
+uint32_t last;
+uint32_t last_pull;
+
 //Utilities
 #include "connect.h"
 #include "firebase_json.h"
 #include "tft_test.h"
 #include "check_status.h"
 #include "show_status.h"
+
+
 
 void setup() {
   connect_Serial();
@@ -88,17 +99,12 @@ void setup() {
   }
 }
 
-int dial_pin_value;
-int dial_return_value;
-int last_firecode_occupancy = firecode_occupancy;
-bool there_is_a_change_to_push = false;
-uint32_t now;
-uint32_t last;
-uint32_t last_pull;
+
 
 void loop() {
   now = millis();
-last_firecode_occupancy = firecode_occupancy;
+  last_firecode_occupancy = firecode_occupancy;
+
   dial_return_value = check_dial_change();
   firecode_occupancy += dial_return_value;
 
