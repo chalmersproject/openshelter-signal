@@ -3,6 +3,37 @@
 // #include <iostream>
 // #include <string>
 
+///
+#include <FastLED.h>
+#define COLOR_ORDER GRB
+#define CHIPSET     WS2811
+#define NUM_LEDS    8
+
+#define BRIGHTNESS  200
+#define FRAMES_PER_SECOND 60
+
+bool gReverseDirection = false;
+
+CRGB leds[NUM_LEDS];
+CRGBPalette16 gPal;
+FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+FastLED.setBrightness( BRIGHTNESS );
+gPal = HeatColors_p;
+// COOLING: How much does the air cool as it rises?
+// Less cooling = taller flames.  More cooling = shorter flames.
+// Default 55, suggested range 20-100
+#define COOLING  55
+
+// SPARKING: What chance (out of 255) is there that a new spark will be lit?
+// Higher chance = more roaring fire.  Lower chance = more flickery fire.
+// Default 120, suggested range 50-200.
+#define SPARKING 120
+
+
+
+
+
+
 //display
 #include <SPI.h>
 // #include <Adafruit_ILI9341.h>
@@ -12,6 +43,9 @@
 //internet
 #include "FirebaseESP8266.h"
 // #include <ESP8266WiFi.h>
+
+//LED
+#include <fire_stuff.h>
 
 // !!!!!!!!!!! THIS FILE IS .gitignore'd !!!!!!!!!!!
 // it includes API keys SSIDs, and passwords
@@ -80,6 +114,8 @@ void setup() {
   // connect_Wifi();
   delay(500);
   connect_TFT();
+  fire_setup();
+  // connect_LED();
   // connect_Firebase();
 
   //if shelter info does not already exist in firebase
@@ -102,8 +138,6 @@ void setup() {
   update_tft_occupancy(firecode_occupancy, firecode_capacity);
 }
 
-
-
 void loop() {
   now = millis();
   last_firecode_occupancy = firecode_occupancy;
@@ -111,6 +145,7 @@ void loop() {
   dial_return_value = check_dial_change();
   firecode_occupancy += dial_return_value;
 
+  update_led_occupancy(firecode_occupancy, firecode_capacity);
   if (firecode_occupancy < last_firecode_occupancy && last_firecode_occupancy < last_last_firecode_occupancy)
   {
     Serial.println("");

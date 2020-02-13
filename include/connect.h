@@ -45,5 +45,5 @@ void connect_TFT()
 
 void connect_LED()
 {
-  #define LED_PIN D0
+
 }

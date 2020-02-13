@@ -19,10 +19,6 @@ void show_chalmers_start()
   tft.println("  Signal!");
 }
 
-void show_lights_status()
-{
-
-}
 
 void update_tft_occupancy(int occupancy, int capacity)
 {
@@ -37,7 +33,14 @@ void update_tft_occupancy(int occupancy, int capacity)
   tft.println(capacity);
 }
 
-void update_led_occupancy(int occupancy)
-{
 
+
+void update_led_occupancy(int occupancy, int capacity)
+{
+  // Add entropy to random number generator; we use a lot of it.
+  random16_add_entropy( random());
+  Fire2012WithPalette(); // run simulation frame, using palette colors
+
+  FastLED.show(); // display this frame
+  FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
