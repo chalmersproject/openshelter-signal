@@ -65,6 +65,7 @@ int dial_return_value;
 int last_firecode_occupancy = firecode_occupancy;
 int last_last_firecode_occupancy = firecode_occupancy;
 bool there_is_a_change_to_push = false;
+bool there_is_tft_a_change_to_push = false;
 uint32_t now;
 uint32_t last;
 uint32_t last_pull;
@@ -152,6 +153,7 @@ void loop() {
     last_firecode_occupancy = firecode_occupancy;
     last_last_firecode_occupancy = last_firecode_occupancy;
     there_is_a_change_to_push = true;
+    there_is_tft_a_change_to_push = true;
     last_dial_change = now;
   }
 
@@ -159,10 +161,11 @@ void loop() {
   // amount of time between dial position changes during a quick turning of the dial
   // the tft display will only be updated if it's been 240 milliseconds since the last
   // time the dial has been moved
-  if(now - last_dial_change >= 240 && there_is_a_change_to_push == true)
+  if(now - last_dial_change >= 240 && there_is_tft_a_change_to_push == true)
   {
     update_tft_occupancy(firecode_occupancy, firecode_capacity);
     last_dial_change = now;
+    there_is_tft_a_change_to_push = false;
   }
 
   //only push to firebase if there is a change to push and it has been
