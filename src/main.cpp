@@ -11,7 +11,7 @@
 
 //internet
 #include "FirebaseESP8266.h"
-// #include <ESP8266WiFi.h>
+#include <ESP8266WiFi.h>
 
 //LED
 #include <FastLED.h>
@@ -83,18 +83,20 @@ int led_brightness = 64;
 #include "check_status.h"
 #include "show_status.h"
 
-
+//////////////////////////////////////////////////////////
+//                       Setup                          //
+//////////////////////////////////////////////////////////
 
 void setup() {
   connect_Serial();
   Serial.println("Start Chalmers Signal!");
   pinMode(dial_pin, INPUT);
 
-  // connect_Wifi();
+  connect_Wifi();
   delay(500);
   connect_TFT();
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
-  // connect_Firebase();
+  connect_Firebase();
 
   //if shelter info does not already exist in firebase
   //create a json object at shelter path and push to firebase
@@ -103,7 +105,7 @@ void setup() {
     Serial.println("Shelter data does not exist in firebase!");
     Serial.println("Creating Shelter data and pushing to firebase!");
     set_local_json();
-    // write_local_to_remote();
+    write_local_to_remote();
   }
   //else if shelter data is already in firebase
   //pull the last shelter occupancy pushed to firebase
@@ -115,6 +117,10 @@ void setup() {
   }
   update_tft_occupancy(firecode_occupancy, firecode_capacity);
 }
+
+//////////////////////////////////////////////////////////
+//                       Loop                           //
+//////////////////////////////////////////////////////////
 
 void loop() {
   now = millis();
@@ -131,7 +137,6 @@ void loop() {
     Serial.println("");
     Serial.println("Bug above!");
     delay(10000);
-
   }
 
   //if firecode occupancy has changed
@@ -158,7 +163,6 @@ void loop() {
   {
     update_tft_occupancy(firecode_occupancy, firecode_capacity);
     last_dial_change = now;
-    there_is_a_change_to_push = false;
   }
 
   //only push to firebase if there is a change to push and it has been
@@ -166,8 +170,18 @@ void loop() {
   //so to avoid pushing a million times when the dial is turned
   //a whole bunch of times during an update by the user
   if ( (now - last >= 1000) && there_is_a_change_to_push ){
-    // Firebase.pushInt(firebaseData, path_firecode_occupancy, firecode_occupancy);
 
+    if(Firebase.setInt(firebaseData, path_firecode_occupancy, firecode_occupancy))
+    {
+      Serial.println("Updating Firebase!!");
+      Serial.println("Updating Firebase!!");
+      Serial.println("Updating Firebase!!");
+    }
+    else
+    {
+      Serial.println("REASON: " + firebaseData.errorReason());
+      delay(1000);
+    }
     there_is_a_change_to_push = false;
     last = now;
     last_pull = now;
