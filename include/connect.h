@@ -45,5 +45,6 @@ void connect_TFT()
 
 void connect_LED()
 {
-
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.setBrightness(led_brightness);
 }

@@ -3,37 +3,6 @@
 // #include <iostream>
 // #include <string>
 
-///
-#include <FastLED.h>
-#define COLOR_ORDER GRB
-#define CHIPSET     WS2811
-#define NUM_LEDS    8
-
-#define BRIGHTNESS  200
-#define FRAMES_PER_SECOND 60
-
-bool gReverseDirection = false;
-
-CRGB leds[NUM_LEDS];
-CRGBPalette16 gPal;
-FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-FastLED.setBrightness( BRIGHTNESS );
-gPal = HeatColors_p;
-// COOLING: How much does the air cool as it rises?
-// Less cooling = taller flames.  More cooling = shorter flames.
-// Default 55, suggested range 20-100
-#define COOLING  55
-
-// SPARKING: What chance (out of 255) is there that a new spark will be lit?
-// Higher chance = more roaring fire.  Lower chance = more flickery fire.
-// Default 120, suggested range 50-200.
-#define SPARKING 120
-
-
-
-
-
-
 //display
 #include <SPI.h>
 // #include <Adafruit_ILI9341.h>
@@ -45,7 +14,7 @@ gPal = HeatColors_p;
 // #include <ESP8266WiFi.h>
 
 //LED
-#include <fire_stuff.h>
+#include <FastLED.h>
 
 // !!!!!!!!!!! THIS FILE IS .gitignore'd !!!!!!!!!!!
 // it includes API keys SSIDs, and passwords
@@ -68,11 +37,11 @@ FirebaseJson testJson;
 String path = "/Shelters/st_felix_augusta";
 String path_firecode_occupancy = "/Shelters/st_felix_augusta/Service_Status/Firecode_Space/Firecode_Occupancy";
 //available space
-int firecode_capacity = 100;
+int bed_occupancy = 42;
 int bed_capacity      = 43;
 //------------------------//
+int firecode_capacity = 65;
 int firecode_occupancy = 42;
-int bed_occupancy = 42;
 
 //meal_status (meal, no_meal, snacks)
 String meal_status = "meal";
@@ -86,6 +55,10 @@ bool female_only = false;
 bool lgbtq_only = false;
 bool all_allowed = true;
 
+//////////////////////////////////////////////////////////
+//             Globals and Utilities                    //
+//////////////////////////////////////////////////////////
+
 //Global Variables
 int dial_pin_value;
 int dial_return_value;
@@ -96,6 +69,12 @@ uint32_t now;
 uint32_t last;
 uint32_t last_pull;
 uint32_t last_dial_change;
+
+//LED Global Variables
+#define NUM_LEDS 8
+#define DATA_PIN 5
+CRGB leds[NUM_LEDS];
+int led_brightness = 64;
 
 //Utilities
 #include "connect.h"
@@ -114,8 +93,7 @@ void setup() {
   // connect_Wifi();
   delay(500);
   connect_TFT();
-  fire_setup();
-  // connect_LED();
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
   // connect_Firebase();
 
   //if shelter info does not already exist in firebase
@@ -146,6 +124,8 @@ void loop() {
   firecode_occupancy += dial_return_value;
 
   update_led_occupancy(firecode_occupancy, firecode_capacity);
+
+
   if (firecode_occupancy < last_firecode_occupancy && last_firecode_occupancy < last_last_firecode_occupancy)
   {
     Serial.println("");

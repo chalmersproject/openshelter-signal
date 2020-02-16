@@ -34,13 +34,14 @@ void update_tft_occupancy(int occupancy, int capacity)
 }
 
 
-
+int hue = 0;
+uint32 led_last;
 void update_led_occupancy(int occupancy, int capacity)
-{
-  // Add entropy to random number generator; we use a lot of it.
-  random16_add_entropy( random());
-  Fire2012WithPalette(); // run simulation frame, using palette colors
-
-  FastLED.show(); // display this frame
-  FastLED.delay(1000 / FRAMES_PER_SECOND);
+{ 
+  //empty occupancy = blue / 171
+  //full occupancy  = red / 0
+  hue = map(occupancy, 0, capacity, 171, 0);
+  CHSV color = CHSV(hue, 255, 255);
+  fill_solid(leds,NUM_LEDS, color);
+  FastLED.show();
 }
