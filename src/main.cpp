@@ -1,11 +1,7 @@
-// #define _GLIBCXX_USE_C99 1
 #include <Arduino.h>
-// #include <iostream>
-// #include <string>
 
 //display
 #include <SPI.h>
-// #include <Adafruit_ILI9341.h>
 #include <TFT_ILI9163C.h>
 #include <Adafruit_GFX.h>
 
@@ -126,19 +122,10 @@ void setup() {
 void loop() {
   now = millis();
   last_firecode_occupancy = firecode_occupancy;
-  last_last_firecode_occupancy = last_firecode_occupancy;
   dial_return_value = check_dial_change();
   firecode_occupancy += dial_return_value;
 
   update_led_occupancy(firecode_occupancy, firecode_capacity);
-
-
-  if (firecode_occupancy < last_firecode_occupancy && last_firecode_occupancy < last_last_firecode_occupancy)
-  {
-    Serial.println("");
-    Serial.println("Bug above!");
-    delay(10000);
-  }
 
   //if firecode occupancy has changed
   if (firecode_occupancy != last_firecode_occupancy)
