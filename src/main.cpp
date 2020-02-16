@@ -125,25 +125,32 @@ void loop() {
   dial_return_value = check_dial_change();
   firecode_occupancy += dial_return_value;
 
-  update_led_occupancy(firecode_occupancy, firecode_capacity);
-
   //if firecode occupancy has changed
   if (firecode_occupancy != last_firecode_occupancy)
   {
-    //update display, then delay pushing to firebase by 600 milliseconds
-    //by resetting last to now
-    //set the "change to push" boolean to true
-    // update_tft_occupancy(firecode_occupancy, firecode_capacity);
-    Serial.print("Firecode_Occupancy: ");
-    Serial.println(firecode_occupancy);
-    last = now;
-    last_firecode_occupancy = firecode_occupancy;
-    last_last_firecode_occupancy = last_firecode_occupancy;
-    there_is_a_change_to_push = true;
-    there_is_tft_a_change_to_push = true;
-    last_dial_change = now;
+    // if occupancy has just become larger than capacity or less than zero
+    // then hold it at it's current value instead of increasing it.
+    if (firecode_occupancy > firecode_capacity || 0 > firecode_occupancy)
+    {
+      firecode_occupancy = last_firecode_occupancy;
+    }
+    else
+    {
+      // update display, then delay pushing to firebase by 600 milliseconds
+      // by resetting last to now
+      // set the "change to push" boolean to true
+      // update_tft_occupancy(firecode_occupancy, firecode_capacity);
+      Serial.print("Firecode_Occupancy: ");
+      Serial.println(firecode_occupancy);
+      last = now;
+      last_firecode_occupancy = firecode_occupancy;
+      last_last_firecode_occupancy = last_firecode_occupancy;
+      there_is_a_change_to_push = true;
+      there_is_tft_a_change_to_push = true;
+      last_dial_change = now;
+    }
   }
-
+  update_led_occupancy(firecode_occupancy, firecode_capacity);
   // because updating the display introduces a delay that can be longer than the
   // amount of time between dial position changes during a quick turning of the dial
   // the tft display will only be updated if it's been 240 milliseconds since the last
@@ -179,8 +186,13 @@ void loop() {
 
   // if there hasn't been a change pushed in the last 2 seconds
   // pull the latest from firebase
+  /*
   if ( now - last_pull >= 2000 )
   {
-    // Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
+    Serial.println("Pulling from Firebase!!");
+    Serial.println("Pulling from Firebase!!");
+    Serial.println("Pulling from Firebase!!");
+    Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
   }
+  */
 }
