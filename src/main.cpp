@@ -21,6 +21,10 @@
 //////////////////////////////////////////////////////////
 //                Shelter Properties                    //
 //////////////////////////////////////////////////////////
+String friendly_name = "St. Felix Centre Augusta";
+const double shetler_latitude = 43.6492;
+const double shelter_longitude = -79.3995;
+const int phone_number = 4162031624;
 
 //json objects
 FirebaseData firebaseData;

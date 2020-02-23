@@ -1,4 +1,3 @@
-
 void set_local_json()
 {
   FirebaseJson Firecode_Space;
@@ -16,12 +15,12 @@ void set_local_json()
   Service_Status.addJson("Firecode_Space", &Firecode_Space).addJson("Bed_Space", &Bed_Space).addString("meal_status", meal_status);
   // Service_Status.addJson("Firecode_Space", &Firecode_Space).addJson("Bed_Space", &Bed_Space);
 
+  FirebaseJson Shelter_Properties;
+  Shelter_Properties.addDouble("latitude", shetler_latitude).addDouble("longitude", shelter_longitude).addInt("phone_number", phone_number);
   FirebaseJson Client_Properties;
   Client_Properties.addBool("adult_only",adult_only).addBool("youth_only",youth_only).addBool("family_only",family_only).addBool("male_only", male_only).addBool("female_only",female_only).addBool("lgbtq_only",lgbtq_only).addBool("all_allowed",all_allowed);
 
-
-  // json.clear().addJson("Service_Status", &Service_Status).addJson("Client_Properties", &Client_Properties);
-  json.addJson("Service_Status", &Service_Status).addJson("Client_Properties", &Client_Properties);
+  json.addJson("Service_Status", &Service_Status).addJson("Shelter_Properties", &Shelter_Properties).addJson("Client_Properties", &Client_Properties);
 }
 
 void write_local_to_remote()
