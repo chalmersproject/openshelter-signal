@@ -21,10 +21,11 @@
 //////////////////////////////////////////////////////////
 //                Shelter Properties                    //
 //////////////////////////////////////////////////////////
+#define shelter_latitude 43.6492
+#define shelter_longitude -79.3995
+String phone_number = "4162031624";
 String friendly_name = "St. Felix Centre Augusta";
-const double shetler_latitude = 43.6492;
-const double shelter_longitude = -79.3995;
-const int phone_number = 4162031624;
+
 
 //json objects
 FirebaseData firebaseData;
@@ -94,13 +95,22 @@ void setup() {
   pinMode(dial_pin, INPUT);
 
   connect_Wifi();
-  delay(500);
+  delay(1000);
+
   connect_TFT();
+  Serial.println("conencted TFT");
+  delay(1000);
+
+
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
+  Serial.println("connected LEDs");
+  delay(1000);
+
   connect_Firebase();
 
   //if shelter info does not already exist in firebase
   //create a json object at shelter path and push to firebase
+
   if( !Firebase.getJSON(firebaseData, path) )
   {
     Serial.println("Shelter data does not exist in firebase!");
@@ -113,9 +123,10 @@ void setup() {
   else
   {
     Serial.print("Pulling last known occupancy for " + path + " : ");
-    // Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
+    Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
     Serial.println(firecode_occupancy);
   }
+
   update_tft_occupancy(firecode_occupancy, firecode_capacity);
 }
 
@@ -143,7 +154,6 @@ void loop() {
       // update display, then delay pushing to firebase by 600 milliseconds
       // by resetting last to now
       // set the "change to push" boolean to true
-      // update_tft_occupancy(firecode_occupancy, firecode_capacity);
       Serial.print("Firecode_Occupancy: ");
       Serial.println(firecode_occupancy);
       last = now;

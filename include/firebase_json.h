@@ -16,7 +16,10 @@ void set_local_json()
   // Service_Status.addJson("Firecode_Space", &Firecode_Space).addJson("Bed_Space", &Bed_Space);
 
   FirebaseJson Shelter_Properties;
-  Shelter_Properties.addDouble("latitude", shetler_latitude).addDouble("longitude", shelter_longitude).addInt("phone_number", phone_number);
+  // Shelter_Properties.addDouble("latitude", shelter_latitude).addDouble("longitude", shelter_longitude).addString("phone_number", phone_number).addString("friendly_name", friendly_name);
+
+  Shelter_Properties.addDouble("latitude", shelter_latitude).addDouble("longitude", shelter_longitude);
+
   FirebaseJson Client_Properties;
   Client_Properties.addBool("adult_only",adult_only).addBool("youth_only",youth_only).addBool("family_only",family_only).addBool("male_only", male_only).addBool("female_only",female_only).addBool("lgbtq_only",lgbtq_only).addBool("all_allowed",all_allowed);
 
