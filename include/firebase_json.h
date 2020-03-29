@@ -1,3 +1,11 @@
+//json objects
+FirebaseData firebaseData;
+FirebaseJson json;
+FirebaseJsonObject jsonParseResult;
+
+String jsonData = "";
+FirebaseJson testJson;
+
 void set_local_json()
 {
   FirebaseJson Firecode_Space;
