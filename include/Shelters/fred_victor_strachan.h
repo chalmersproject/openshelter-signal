@@ -1,18 +1,19 @@
 //////////////////////////////////////////////////////////
 //                Shelter Properties                    //
 //////////////////////////////////////////////////////////
-#define shelter_latitude 43.6492
-#define shelter_longitude -79.3995
-String phone_number = "4162031624";
+#define shelter_latitude 43.635480
+#define shelter_longitude -79.408892
+String phone_number = "(416) 364-8228";
 String friendly_name = "Fred Victor Strachan Respite";
+String friendly_address = "1A Strachan Ave Toronto ON M6K 3C3";
 
-String path = "/Shelters/st_felix_augusta";
-String path_firecode_occupancy = "/Shelters/st_felix_augusta/Service_Status/Firecode_Space/Firecode_Occupancy";
+String path = "/Shelters/fred_victor_strachan";
+String path_firecode_occupancy = "/Shelters/fred_victor_strachan/Service_Status/Firecode_Space/Firecode_Occupancy";
 //available space
 int bed_occupancy = 42;
-int bed_capacity      = 43;
+int bed_capacity  = 60;
 //------------------------//
-int firecode_capacity = 65;
+int firecode_capacity = 100;
 int firecode_occupancy = 42;
 
 //Client Properties
@@ -23,6 +24,7 @@ bool male_only = false;
 bool female_only = false;
 bool lgbtq_only = false;
 bool all_allowed = true;
+bool pet_friendly = true;
 
 //meal_status (meal, no_meal, snacks)
 String meal_status = "meal";
