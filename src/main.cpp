@@ -17,7 +17,7 @@
 // You need to fill it in with your own credentials
 // before this program will work.
 #include "credentials.h"
-#include "Shelters/fred_victor_strachan.h"
+#include "Shelters/housing_first_strachan_house.h"
 
 
 //////////////////////////////////////////////////////////
