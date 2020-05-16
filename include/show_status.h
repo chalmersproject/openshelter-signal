@@ -22,9 +22,9 @@ void show_chalmers_start()
 
 void update_tft_occupancy(int occupancy, int capacity)
 {
-  tft.fillScreen();
+  // tft.fillScreen();
   tft.setCursor(35, 10);
-  tft.setTextColor(WHITE);
+  tft.setTextColor(WHITE, BLACK);
   tft.setTextSize(5);
   tft.println(occupancy);
   tft.setCursor(8, 42);
@@ -37,7 +37,7 @@ void update_tft_occupancy(int occupancy, int capacity)
 int hue = 0;
 uint32 led_last;
 void update_led_occupancy(int occupancy, int capacity)
-{ 
+{
   //empty occupancy = blue / 171
   //full occupancy  = red / 0
   hue = map(occupancy, 0, capacity, 171, 0);

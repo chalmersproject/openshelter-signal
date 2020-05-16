@@ -42,6 +42,8 @@ uint32_t last_dial_change;
 CRGB leds[NUM_LEDS];
 int led_brightness = 64;
 
+//TFT Global Variables
+int lED_DELAY = 25;
 //Utilities
 #include "connect.h"
 #include "firebase_json.h"
@@ -133,7 +135,7 @@ void loop() {
   // amount of time between dial position changes during a quick turning of the dial
   // the tft display will only be updated if it's been 240 milliseconds since the last
   // time the dial has been moved
-  if(now - last_dial_change >= 240 && there_is_tft_a_change_to_push == true)
+  if(now - last_dial_change >= lED_DELAY && there_is_tft_a_change_to_push == true)
   {
     update_tft_occupancy(firecode_occupancy, firecode_capacity);
     last_dial_change = now;
