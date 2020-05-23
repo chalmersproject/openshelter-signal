@@ -1,6 +1,14 @@
 # Chalmers Signal Occupancy
 
-This repository is for organization and work on the Chalmers-Signal-Occupancy device firmware.x
+## Rotary-Switch Branch
+This branch is for chalmers signals that use the 12P rotary switches you can buy from creatron at College and Spadina. It expects 10K resistors between it's pins.
+
+I'm just archiving this versions of the firmware in this branch to keep a copy for supporting legacy chalmers signals that have these rotary switches in them.
+
+--- 
+
+## This repo
+This repository is for organization and work on the Chalmers-Signal-Occupancy device firmware.
 
 ## Quick Start
 Setting up a development environment for this firmware is easiest with Platform IO.
