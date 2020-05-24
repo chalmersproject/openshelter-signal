@@ -3,63 +3,37 @@ int dial_value, current_value, last_value, mapped_value;
 int val_1 = 0;
 int val_2 = 500;
 
+
+int counter = 0;
+int currentStateCLK;
+int previousStateCLK;
+
 //records the time since last time dial status was printed to console
 uint32_t last_dial_check = 0;
 
 int check_dial_change()
 {
-  if (now - last_dial_check >= 300)
-  {
-    Serial.println("----------------------");
-    Serial.println("----------------------");
-    Serial.print("dial_value: ");
-    Serial.println(dial_value);
-    Serial.print("mapped_value: ");
-    Serial.println(mapped_value);
-    Serial.println("----------------------");
-    Serial.println("----------------------");
-    Serial.println("");
-    Serial.println("");
+  // Read the current state of inputCLK
+    currentStateCLK = digitalRead(inputCLK);
 
-    last_dial_check = now;
-  }
+    // If the previous and the current state of the inputCLK are different then a pulse has occured
+    if (currentStateCLK != previousStateCLK){
 
-  dial_value = analogRead(dial_pin);
-  mapped_value = map(dial_value, val_1, val_2, 0, 5);
-  // if mapped_value resolves to some value other than the known discrete dial values
-  // then analogRead was probably run while the dial was between positions and pin A0's
-  // PWM resolved something between the last dial position and the next dial position
-  //
-  // therefore set mapped_value to the last recoorded value
-  if(mapped_value != 2 && mapped_value != 3 && mapped_value !=5)
-  {
-    Serial.println("mapped_value came out to something strange!");
-    Serial.print("Mapped Value: ");
-    Serial.println(mapped_value);
-    mapped_value = current_value; //at this point current_value is actually the last recorded value, not last_value
-  }
-
-  last_value = current_value;
-  current_value = mapped_value;
-
-  if(last_value == current_value)
-  {
-    return 0;
-  }
-  else if (last_value == 5 && current_value == 2)
-  {
-    return 1;
-  }
-  else if (last_value == 2 && current_value == 3)
-  {
-    return 1;
-  }
-  else if (last_value == 3 && current_value == 5)
-  {
-    return 1;
-  }
-  else
-  {
-    return -1;
-  }
+      // If the inputDT state is different than the inputCLK state then
+      // the encoder is rotating counterclockwise
+      if (digitalRead(inputDT) != currentStateCLK) {
+        counter --;
+        encdir ="CCW";
+      } else {
+        // Encoder is rotating clockwise
+        counter ++;
+        encdir ="CW";
+      }
+      Serial.print("Direction: ");
+      Serial.print(encdir);
+      Serial.print(" -- Value: ");
+      Serial.println(counter);
+    }
+    // Update previousStateCLK with the current state
+    previousStateCLK = currentStateCLK;
 }
