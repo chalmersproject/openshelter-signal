@@ -36,6 +36,10 @@ uint32_t last;
 uint32_t last_pull;
 uint32_t last_dial_change;
 
+//Rotary Encoder Global Variables
+int currentStateCLK;
+int previousStateCLK;
+
 //LED Global Variables
 #define NUM_LEDS 8
 #define DATA_PIN 5

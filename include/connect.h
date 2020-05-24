@@ -7,7 +7,7 @@ void connect_Serial(){
 // Rotary Encoder Inputs
 #define inputCLK 5
 #define inputDT 4
-void connect rotary_Encoder(){
+void connect_Rotary_Encoder(){
   // Set encoder pins as inputs
   pinMode (inputCLK,INPUT);
   pinMode (inputDT,INPUT);
@@ -16,6 +16,7 @@ void connect rotary_Encoder(){
   // Assign to previousStateCLK variable
   previousStateCLK = digitalRead(inputCLK);
 }
+
 void connect_Wifi(){
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     Serial.print("Connecting to Wi-Fi");
