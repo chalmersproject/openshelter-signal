@@ -22,7 +22,6 @@ void show_chalmers_start()
 
 void update_tft_occupancy(int occupancy, int capacity)
 {
-  // tft.fillScreen();
   tft.setCursor(35, 10);
   tft.setTextColor(WHITE, BLACK);
   tft.setTextSize(5);

@@ -5,16 +5,12 @@ void connect_Serial(){
 }
 
 // Rotary Encoder Inputs
-#define inputCLK 5
-#define inputDT 4
+// #define inputCLK 5
+// #define inputDT 4
 void connect_Rotary_Encoder(){
   // Set encoder pins as inputs
   pinMode (inputCLK,INPUT);
   pinMode (inputDT,INPUT);
-
-  // Read the initial state of inputCLK
-  // Assign to previousStateCLK variable
-  previousStateCLK = digitalRead(inputCLK);
 }
 
 void connect_Wifi(){
@@ -34,6 +30,7 @@ void connect_Wifi(){
 void connect_Firebase(){
     Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
     Firebase.reconnectWiFi(true);
+    Serial.println("Firebase Connnected");
 }
 
 void connect_TFT()

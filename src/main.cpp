@@ -1,3 +1,22 @@
+//when encoder clk triggers
+  // counter + or -
+  // if counter % 2 == 0          //the rotary encoder counts twice per "bump"
+    //update occupancy(counter/2) //so I just count 2 jumps as 1
+    //update tft(occupancy)
+    //update led(occupancy)
+
+//in main loop
+  //if occupancy is different from last_occupancy
+    // change_to_push=true
+    // firebase_upload_countdown_start=now
+    // if (now - firebase_upload_countdown_start > 4000 && change_to_push == true)
+        // upload to firebase
+        // firebase_upload_countdown_start=now
+        // change_to_push = false
+
+//////////////////////////////////////////////////////////
+//                     Includes                         //
+//////////////////////////////////////////////////////////
 #include <Arduino.h>
 
 //display
@@ -18,8 +37,6 @@
 // before this program will work.
 #include "credentials.h"
 #include "Shelters/housing_first_strachan_house.h"
-
-
 //////////////////////////////////////////////////////////
 //             Globals and Utilities                    //
 //////////////////////////////////////////////////////////
@@ -36,18 +53,18 @@ uint32_t last;
 uint32_t last_pull;
 uint32_t last_dial_change;
 
-//Rotary Encoder Global Variables
-int currentStateCLK;
-int previousStateCLK;
-
 //LED Global Variables
 #define NUM_LEDS 8
 #define DATA_PIN 5
 CRGB leds[NUM_LEDS];
 int led_brightness = 64;
 
-//TFT Global Variables
-int lED_DELAY = 25;
+//Rotary Encoder Global Variables
+volatile int stateCLK;
+volatile int encoder_rotation_counter = 0; //the rotary encoder counts two rotations per "bump" so I just count 2 rotations as 1. This variable tracks the individual rotations so a full bump-to-bump event only counts as 1 when added to firecode_occupancy
+#define inputCLK  4
+#define inputDT 5
+
 //Utilities
 #include "connect.h"
 #include "firebase_json.h"
@@ -56,13 +73,32 @@ int lED_DELAY = 25;
 #include "show_status.h"
 
 //////////////////////////////////////////////////////////
-//                       Setup                          //
+//             Script Starts Here                       //
 //////////////////////////////////////////////////////////
+bool change_to_push = false;
+void encoder_change_trigger()
+{
+  change_to_push = true;
+  firecode_occupancy+=read_dial_change();
+  update_tft_occupancy(firecode_occupancy, firecode_capacity);
+  update_led_occupancy(firecode_occupancy, firecode_capacity);
+  Serial.println("=========================================");
+  Serial.print("shelter occupancy:"); Serial.println(firecode_occupancy);
+}
 
-void setup() {
+void setup()
+{
   connect_Serial();
+  Serial.println("======================");
+  Serial.println("======================");
   Serial.println("Start Chalmers Signal!");
-  pinMode(dial_pin, INPUT);
+  Serial.println("======================");
+  Serial.println("======================");
+
+  pinMode(inputCLK, INPUT);
+  pinMode (inputDT,INPUT);
+  Serial.println("attaching interrupt!");
+  attachInterrupt(digitalPinToInterrupt(inputCLK), encoder_change_trigger, CHANGE);
 
   connect_Wifi();
   delay(1000);
@@ -71,112 +107,10 @@ void setup() {
   Serial.println("conencted TFT");
   delay(1000);
 
-
   FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
   Serial.println("connected LEDs");
   delay(1000);
 
   connect_Firebase();
-
-  //if shelter info does not already exist in firebase
-  //create a json object at shelter path and push to firebase
-
-  if( !Firebase.getJSON(firebaseData, path) )
-  {
-    Serial.println("Shelter data does not exist in firebase!");
-    Serial.println("Creating Shelter data and pushing to firebase!");
-    set_local_json();
-    write_local_to_remote();
-  }
-  //else if shelter data is already in firebase
-  //pull the last shelter occupancy pushed to firebase
-  else
-  {
-    Serial.print("Pulling last known occupancy for " + path + " : ");
-    Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
-    Serial.println(firecode_occupancy);
-  }
-
-  update_tft_occupancy(firecode_occupancy, firecode_capacity);
 }
-
-//////////////////////////////////////////////////////////
-//                       Loop                           //
-//////////////////////////////////////////////////////////
-
-void loop() {
-  now = millis();
-  last_firecode_occupancy = firecode_occupancy;
-  dial_return_value = check_dial_change();
-  firecode_occupancy += dial_return_value;
-
-  //if firecode occupancy has changed
-  if (firecode_occupancy != last_firecode_occupancy)
-  {
-    // if occupancy has just become larger than capacity or less than zero
-    // then hold it at it's current value instead of increasing it.
-    if (firecode_occupancy > firecode_capacity || 0 > firecode_occupancy)
-    {
-      firecode_occupancy = last_firecode_occupancy;
-    }
-    else
-    {
-      // update display, then delay pushing to firebase by 600 milliseconds
-      // by resetting last to now
-      // set the "change to push" boolean to true
-      Serial.print("Firecode_Occupancy: ");
-      Serial.println(firecode_occupancy);
-      last = now;
-      last_firecode_occupancy = firecode_occupancy;
-      last_last_firecode_occupancy = last_firecode_occupancy;
-      there_is_a_change_to_push = true;
-      there_is_tft_a_change_to_push = true;
-      last_dial_change = now;
-    }
-  }
-  update_led_occupancy(firecode_occupancy, firecode_capacity);
-  // because updating the display introduces a delay that can be longer than the
-  // amount of time between dial position changes during a quick turning of the dial
-  // the tft display will only be updated if it's been 240 milliseconds since the last
-  // time the dial has been moved
-  if(now - last_dial_change >= lED_DELAY && there_is_tft_a_change_to_push == true)
-  {
-    update_tft_occupancy(firecode_occupancy, firecode_capacity);
-    last_dial_change = now;
-    there_is_tft_a_change_to_push = false;
-  }
-
-  //only push to firebase if there is a change to push and it has been
-  //at least 600 milliseconds since the last change
-  //so to avoid pushing a million times when the dial is turned
-  //a whole bunch of times during an update by the user
-  if ( (now - last >= 1000) && there_is_a_change_to_push ){
-
-    if(Firebase.setInt(firebaseData, path_firecode_occupancy, firecode_occupancy))
-    {
-      Serial.println("Updating Firebase!!");
-      Serial.println("Updating Firebase!!");
-      Serial.println("Updating Firebase!!");
-    }
-    else
-    {
-      Serial.println("REASON: " + firebaseData.errorReason());
-      delay(1000);
-    }
-    there_is_a_change_to_push = false;
-    last = now;
-    last_pull = now;
-  }
-
-  // if there hasn't been a change pushed in the last 2 seconds
-  // pull the latest from firebase
-  /*
-  if ( now - last_pull >= 2000 )
-  {
-    Serial.println("Pulling from Firebase!!");
-    Serial.println("Pulling from Firebase!!");
-    Serial.println("Pulling from Firebase!!");
-    Firebase.getInt(firebaseData, path + "/Service_Status/Firecode_Space/Firecode_Occupancy", firecode_occupancy);
-  }
-  */
-}
+void loop(){}
