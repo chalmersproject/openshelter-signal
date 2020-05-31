@@ -76,12 +76,12 @@ volatile int encoder_rotation_counter = 0; //the rotary encoder counts two rotat
 //             Script Starts Here                       //
 //////////////////////////////////////////////////////////
 bool change_to_push = false;
-void encoder_change_trigger()
+void ICACHE_RAM_ATTR encoder_change_trigger()
 {
   change_to_push = true;
   firecode_occupancy+=read_dial_change();
-  update_tft_occupancy(firecode_occupancy, firecode_capacity);
-  update_led_occupancy(firecode_occupancy, firecode_capacity);
+  // update_tft_occupancy(firecode_occupancy, firecode_capacity);
+  // update_led_occupancy(firecode_occupancy, firecode_capacity);
   Serial.println("=========================================");
   Serial.print("shelter occupancy:"); Serial.println(firecode_occupancy);
 }
