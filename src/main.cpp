@@ -23,6 +23,7 @@
 #include <SPI.h>
 #include <TFT_ILI9163C.h>
 #include <Adafruit_GFX.h>
+#include <RotaryEncoder.h>
 
 //internet
 #include "FirebaseESP8266.h"
@@ -60,57 +61,76 @@ CRGB leds[NUM_LEDS];
 int led_brightness = 64;
 
 //Rotary Encoder Global Variables
-volatile int stateCLK;
-volatile int encoder_rotation_counter = 0; //the rotary encoder counts two rotations per "bump" so I just count 2 rotations as 1. This variable tracks the individual rotations so a full bump-to-bump event only counts as 1 when added to firecode_occupancy
-#define inputCLK  4
+#define inputCLK 4
 #define inputDT 5
+RotaryEncoder encoder(5, 4);
+
+// volatile int stateCLK;
+// volatile int encoder_rotation_counter = 0; //the rotary encoder counts two rotations per "bump" so I just count 2 rotations as 1. This variable tracks the individual rotations so a full bump-to-bump event only counts as 1 when added to firecode_occupancy
+// #define inputCLK  4
+// #define inputDT 5
+// //Encoder Global
+// RotaryEncoder encoder(4, 5);
 
 //Utilities
-#include "connect.h"
-#include "firebase_json.h"
-#include "tft_test.h"
-#include "check_status.h"
-#include "show_status.h"
+// #include "connect.h"
+// #include "firebase_json.h"
+// #include "tft_test.h"
+// #include "check_status.h"
+// #include "show_status.h"
 
 //////////////////////////////////////////////////////////
 //             Script Starts Here                       //
 //////////////////////////////////////////////////////////
 bool change_to_push = false;
-void ICACHE_RAM_ATTR encoder_change_trigger()
-{
-  change_to_push = true;
-  firecode_occupancy+=read_dial_change();
-  // update_tft_occupancy(firecode_occupancy, firecode_capacity);
-  // update_led_occupancy(firecode_occupancy, firecode_capacity);
-  Serial.println("=========================================");
-  Serial.print("shelter occupancy:"); Serial.println(firecode_occupancy);
-}
+// void ICACHE_RAM_ATTR encoder_change_trigger()
+// {
+//   change_to_push = true;
+//   firecode_occupancy+=read_dial_change();
+//   // update_tft_occupancy(firecode_occupancy, firecode_capacity);
+//   // update_led_occupancy(firecode_occupancy, firecode_capacity);
+//   Serial.println("=========================================");
+//   Serial.print("shelter occupancy:"); Serial.println(firecode_occupancy);
+// }
 
+void ICACHE_RAM_ATTR encoder_change_trigger() {
+  Serial.println("interrupt triggered!");
+  encoder.tick();
+}
 void setup()
 {
-  connect_Serial();
+  Serial.begin(115200);
   Serial.println("======================");
   Serial.println("======================");
   Serial.println("Start Chalmers Signal!");
   Serial.println("======================");
   Serial.println("======================");
 
-  pinMode(inputCLK, INPUT);
-  pinMode (inputDT,INPUT);
-  Serial.println("attaching interrupt!");
-  attachInterrupt(digitalPinToInterrupt(inputCLK), encoder_change_trigger, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(4), encoder_change_trigger, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(5), encoder_change_trigger, CHANGE);
 
-  connect_Wifi();
-  delay(1000);
+  // connect_Wifi();
+  // delay(1000);
+  //
+  // connect_TFT();
+  // Serial.println("conencted TFT");
+  // delay(1000);
+  //
+  // FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
+  // Serial.println("connected LEDs");
+  // delay(1000);
 
-  connect_TFT();
-  Serial.println("conencted TFT");
-  delay(1000);
-
-  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
-  Serial.println("connected LEDs");
-  delay(1000);
-
-  connect_Firebase();
+  // connect_Firebase();
 }
-void loop(){}
+
+void loop(){
+  static int pos = 0;
+
+  int newPos = encoder.getPosition();
+  if (pos != newPos)
+  {
+    Serial.print(newPos);
+    Serial.println();
+    pos = newPos;
+  }
+}
