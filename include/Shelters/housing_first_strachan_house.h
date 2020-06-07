@@ -11,8 +11,8 @@ String shelter_name = "housing_first_strachan_house";
 String path = "/Shelters/" + shelter_name;
 String path_firecode_occupancy = "/Shelters/" + shelter_name + "/Service_Status/Firecode_Space/Firecode_Occupancy";
 //available space
-int firecode_occupancy = 0;
-int firecode_capacity = 88;
+int occupancy = 0;
+int capacity = 88;
 //------------------------//
 int bed_occupancy = 42;
 int bed_capacity  = 60;

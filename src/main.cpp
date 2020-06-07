@@ -37,32 +37,33 @@
 // You need to fill it in with your own credentials
 // before this program will work.
 #include "credentials.h"
+
 #include "Shelters/housing_first_strachan_house.h"
+
 //////////////////////////////////////////////////////////
 //             Globals and Utilities                    //
 //////////////////////////////////////////////////////////
 
-//Global Variables
-int dial_pin_value;
-int dial_return_value;
-int last_firecode_occupancy = firecode_occupancy;
-int last_last_firecode_occupancy = firecode_occupancy;
-bool there_is_a_change_to_push = false;
-bool there_is_tft_a_change_to_push = false;
-uint32_t now;
-uint32_t last;
-uint32_t last_pull;
-uint32_t last_dial_change;
-
-//LED Global Variables
-#define NUM_LEDS 8
-#define DATA_PIN 5
-CRGB leds[NUM_LEDS];
-int led_brightness = 64;
 
 //Rotary Encoder Global Variables
 #define inputCLK 4
 #define inputDT 5
+
+//TFT Globals
+#define __DC 0
+#define __CS 2
+// Color definitions
+#define BLACK 0x0000
+#define BLUE 0x001F
+#define RED 0xF800
+#define GREEN 0x07E0
+#define CYAN 0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW 0xFFE0
+#define WHITE 0xFFFF
+//instatiate TFT!
+TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
+
 RotaryEncoder encoder(5, 4);
 
 // volatile int stateCLK;
@@ -82,16 +83,8 @@ RotaryEncoder encoder(5, 4);
 //////////////////////////////////////////////////////////
 //             Script Starts Here                       //
 //////////////////////////////////////////////////////////
+// flag to mark when the dial has been moved. Calls the LEDs, LCD, and push_to_firebase functions
 bool change_to_push = false;
-// void ICACHE_RAM_ATTR encoder_change_trigger()
-// {
-//   change_to_push = true;
-//   firecode_occupancy+=read_dial_change();
-//   // update_tft_occupancy(firecode_occupancy, firecode_capacity);
-//   // update_led_occupancy(firecode_occupancy, firecode_capacity);
-//   Serial.println("=========================================");
-//   Serial.print("shelter occupancy:"); Serial.println(firecode_occupancy);
-// }
 
 void ICACHE_RAM_ATTR encoder_change_trigger() {
   Serial.println("interrupt triggered!");
@@ -109,6 +102,15 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(4), encoder_change_trigger, CHANGE);
   attachInterrupt(digitalPinToInterrupt(5), encoder_change_trigger, CHANGE);
 
+  tft.begin();
+  tft.setCursor(35, 10);
+  tft.setTextColor(WHITE, BLACK);
+  tft.setTextSize(5);
+  tft.println(occupancy);
+  tft.setCursor(8, 42);
+  tft.println("----");
+  tft.setCursor(20, 75);
+  tft.println(capacity);
   // connect_Wifi();
   // delay(1000);
   //
@@ -132,5 +134,8 @@ void loop(){
     Serial.print(newPos);
     Serial.println();
     pos = newPos;
+    occupancy = newPos;
+    tft.setCursor(35, 10);
+    tft.println(occupancy);
   }
 }
