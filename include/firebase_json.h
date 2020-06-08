@@ -1,18 +1,7 @@
-//json objects
-FirebaseData firebaseData;
-FirebaseJson json;
-FirebaseJsonObject jsonParseResult;
-
-String jsonData = "";
-FirebaseJson testJson;
-
 void set_local_json()
 {
   FirebaseJson Firecode_Space;
-  Firecode_Space.addInt("Firecode_Occupancy", firecode_occupancy).addInt("Firecode_Capacity",firecode_capacity);
-
-  Serial.print("firecode_occupancy init value: ");
-  Serial.println(firecode_occupancy);
+  Firecode_Space.addInt("Firecode_Occupancy", occupancy).addInt("Firecode_Capacity", capacity);
 
 
   FirebaseJson Bed_Space;
@@ -53,53 +42,5 @@ void write_local_to_remote()
       Serial.println("REASON: " + firebaseData.errorReason());
       Serial.println("------------------------------------");
       Serial.println();
-  }
-}
-void pull_remote_json()
-{
-  if (Firebase.getJSON(firebaseData, path))
-  {
-    if (firebaseData.dataType() == "json"){
-      jsonData = firebaseData.jsonData();
-    }
-    else
-    {
-      Serial.println("Some fuckin error writing remote json data to local");\
-      Serial.println("REASON: " + firebaseData.errorReason());
-      Serial.println("------------------------------------");
-      Serial.println();
-    }
-  }else
-  {
-      Serial.println("Some fuckin error writing remote json data to local");\
-      Serial.println("REASON: " + firebaseData.errorReason());
-      Serial.println("------------------------------------");
-      Serial.println();
-  }
-
-}
-
-void write_remote_json_to_local()
-{
-  Serial.println("Clear local JSON");
-  json.clear().setJsonData(jsonData);
-  // json.setJsonData(jsonData);
-  json.parse();
-  size_t count = json.getJsonObjectIteratorCount();
-  String key;
-  String value;
-  for (size_t i = 0; i < count; i++)
-  {
-    json.jsonObjectiterator(i,key,value);
-    jsonParseResult = json.parseResult();
-
-    Serial.print("KEY: ");
-    Serial.print(key);
-    Serial.print(", ");
-    Serial.print("VALUE: ");
-    Serial.print(value);
-    Serial.print(", ");
-    Serial.print("TYPE: ");
-    Serial.println(jsonParseResult.type);
   }
 }

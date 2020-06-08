@@ -32,22 +32,17 @@
 //LED
 #include <FastLED.h>
 
-// !!!!!!!!!!! THIS FILE IS .gitignore'd !!!!!!!!!!!
-// it includes API keys SSIDs, and passwords
-// You need to fill it in with your own credentials
-// before this program will work.
-#include "credentials.h"
-
-#include "Shelters/housing_first_strachan_house.h"
-
 //////////////////////////////////////////////////////////
 //             Globals and Utilities                    //
 //////////////////////////////////////////////////////////
 
+// Which shelter this chalmers signal is for. Defines occupancy, capacity, etc.
+#include "Shelters/housing_first_strachan_house.h"
 
 //Rotary Encoder Global Variables
 #define inputCLK 4
 #define inputDT 5
+RotaryEncoder encoder(5, 4);
 
 //TFT Globals
 #define __DC 0
@@ -64,30 +59,27 @@
 //instatiate TFT!
 TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
 
-RotaryEncoder encoder(5, 4);
+//Wifi Globals
+// !!!!!!!!!!! THIS FILE IS .gitignore'd !!!!!!!!!!!
+// it includes API keys SSIDs, and passwords
+// You need to fill it in with your own credentials
+// before this program will work.
+#include "credentials.h"
 
-// volatile int stateCLK;
-// volatile int encoder_rotation_counter = 0; //the rotary encoder counts two rotations per "bump" so I just count 2 rotations as 1. This variable tracks the individual rotations so a full bump-to-bump event only counts as 1 when added to firecode_occupancy
-// #define inputCLK  4
-// #define inputDT 5
-// //Encoder Global
-// RotaryEncoder encoder(4, 5);
-
-//Utilities
-// #include "connect.h"
-// #include "firebase_json.h"
-// #include "tft_test.h"
-// #include "check_status.h"
-// #include "show_status.h"
+//Firebase Globals
+FirebaseData firebaseData;
+FirebaseJson json;
+FirebaseJsonObject jsonParseResult;
+#include "firebase_json.h" // for pushing new shelter entry if firebase doesn't have this shelter in it already
 
 //////////////////////////////////////////////////////////
 //             Script Starts Here                       //
 //////////////////////////////////////////////////////////
+
 // flag to mark when the dial has been moved. Calls the LEDs, LCD, and push_to_firebase functions
 bool change_to_push = false;
 
 void ICACHE_RAM_ATTR encoder_change_trigger() {
-  Serial.println("interrupt triggered!");
   encoder.tick();
 }
 void setup()
@@ -111,31 +103,52 @@ void setup()
   tft.println("----");
   tft.setCursor(20, 75);
   tft.println(capacity);
-  // connect_Wifi();
-  // delay(1000);
-  //
-  // connect_TFT();
-  // Serial.println("conencted TFT");
-  // delay(1000);
-  //
-  // FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
-  // Serial.println("connected LEDs");
-  // delay(1000);
 
-  // connect_Firebase();
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED)
+  {
+      Serial.print(".");
+      delay(300);
+  }
+  Serial.println(); Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP()); Serial.println();
+
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  Firebase.reconnectWiFi(true);
+  Serial.println("Firebase Connnected");
 }
 
+unsigned long now,last;
 void loop(){
   static int pos = 0;
 
   int newPos = encoder.getPosition();
   if (pos != newPos)
   {
-    Serial.print(newPos);
+    Serial.print("Occupancy: "); Serial.print(newPos);
     Serial.println();
     pos = newPos;
     occupancy = newPos;
     tft.setCursor(35, 10);
     tft.println(occupancy);
+
+    change_to_push=true;
+    last = now;
+  }
+
+  now=millis();
+  if (now - last >= 3000 && change_to_push)
+  {
+    if(Firebase.setInt(firebaseData, path_firecode_occupancy, occupancy))
+    {
+      Serial.println("Updating Firebase!!");
+    }
+    else
+    {
+      Serial.println("REASON: " + firebaseData.errorReason());
+      delay(1000);
+    }
+    change_to_push=false;
   }
 }
