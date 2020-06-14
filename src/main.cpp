@@ -58,7 +58,7 @@ RotaryEncoder encoder(5, 4);
 #define WHITE 0xFFFF
 //instatiate TFT!
 TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
-
+int last_occupancy; //used to detect when occupancy has grown by one digit ( e.g. 9 -> 10 ) and occupancy has to be wiped from the LCD
 //Wifi Globals
 // !!!!!!!!!!! THIS FILE IS .gitignore'd !!!!!!!!!!!
 // it includes API keys SSIDs, and passwords
@@ -104,19 +104,19 @@ void setup()
   tft.setCursor(20, 75);
   tft.println(capacity);
 
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print("Connecting to Wi-Fi");
-  while (WiFi.status() != WL_CONNECTED)
-  {
-      Serial.print(".");
-      delay(300);
-  }
-  Serial.println(); Serial.print("Connected with IP: ");
-  Serial.println(WiFi.localIP()); Serial.println();
-
-  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
-  Firebase.reconnectWiFi(true);
-  Serial.println("Firebase Connnected");
+  // WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  // Serial.print("Connecting to Wi-Fi");
+  // while (WiFi.status() != WL_CONNECTED)
+  // {
+  //     Serial.print(".");
+  //     delay(300);
+  // }
+  // Serial.println(); Serial.print("Connected with IP: ");
+  // Serial.println(WiFi.localIP()); Serial.println();
+  //
+  // Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  // Firebase.reconnectWiFi(true);
+  // Serial.println("Firebase Connnected");
 }
 
 unsigned long now,last;
@@ -131,24 +131,32 @@ void loop(){
     pos = newPos;
     occupancy = newPos;
     tft.setCursor(35, 10);
-    tft.println(occupancy);
 
+    // used to detect when occupancy has grown by one digit ( e.g. 10 -> 9 ) and occupancy has to be wiped from the LCD
+    if ( occupancy == 9 && last_occupancy == 10 || occupancy == 99 && last_occupancy == 100 )
+    {
+      Serial.println("writing over text!");
+      tft.fillRect( 0, 10 , tft.width() , 40 , BLACK );
+      last_occupancy = occupancy;
+    }
+    tft.println(occupancy);
     change_to_push=true;
     last = now;
+    last_occupancy = occupancy;
   }
 
   now=millis();
   if (now - last >= 3000 && change_to_push)
   {
-    if(Firebase.setInt(firebaseData, path_firecode_occupancy, occupancy))
-    {
-      Serial.println("Updating Firebase!!");
-    }
-    else
-    {
-      Serial.println("REASON: " + firebaseData.errorReason());
-      delay(1000);
-    }
+    // if(Firebase.setInt(firebaseData, path_firecode_occupancy, occupancy))
+    // {
+    //   Serial.println("Updating Firebase!!");
+    // }
+    // else
+    // {
+    //   Serial.println("REASON: " + firebaseData.errorReason());
+    //   delay(1000);
+    // }
     change_to_push=false;
   }
 }
