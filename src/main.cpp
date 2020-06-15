@@ -128,14 +128,26 @@ void loop(){
   {
     Serial.print("Occupancy: "); Serial.print(newPos);
     Serial.println();
+    if (pos > newPos)
+    {
+      occupancy--;
+    } else if ( newPos > pos)
+    {
+      occupancy++;
+    }
     pos = newPos;
-    occupancy = newPos;
+    //set barriers on occupancy
+    if ( 0 >= occupancy )
+    {
+      occupancy = 0;
+    } else if ( occupancy >= capacity )
+    {
+      occupancy = capacity;
+    }
     tft.setCursor(35, 10);
-
     // used to detect when occupancy has grown by one digit ( e.g. 10 -> 9 ) and occupancy has to be wiped from the LCD
     if ( occupancy == 9 && last_occupancy == 10 || occupancy == 99 && last_occupancy == 100 )
     {
-      Serial.println("writing over text!");
       tft.fillRect( 0, 10 , tft.width() , 40 , BLACK );
       last_occupancy = occupancy;
     }
