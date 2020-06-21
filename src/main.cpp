@@ -59,8 +59,19 @@ RotaryEncoder encoder(5, 4);
 //instatiate TFT!
 TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
 int last_occupancy; //used to detect when occupancy has grown by one digit ( e.g. 9 -> 10 ) and occupancy has to be wiped from the LCD
+
+// LED Globals
+int hue = 0;
+uint32 led_last;
+#define NUM_LEDS 8
+#define DATA_PIN 15
+CRGB leds[NUM_LEDS];
+int led_brightness = 64;
+
 //Wifi Globals
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // !!!!!!!!!!! THIS FILE IS .gitignore'd !!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 // it includes API keys SSIDs, and passwords
 // You need to fill it in with your own credentials
 // before this program will work.
@@ -93,6 +104,9 @@ void setup()
 
   attachInterrupt(digitalPinToInterrupt(4), encoder_change_trigger, CHANGE);
   attachInterrupt(digitalPinToInterrupt(5), encoder_change_trigger, CHANGE);
+
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.setBrightness(led_brightness);
 
   tft.begin();
   tft.setCursor(35, 10);
@@ -156,6 +170,11 @@ void loop(){
     }
     tft.println(occupancy);
     // update LEDs
+    hue = map(occupancy, 0, capacity, 171, 0);
+    CHSV color = CHSV(hue, 255, 255);
+    fill_solid(leds,NUM_LEDS, color);
+    FastLED.show();
+
     change_to_push=true;
     last = now;
     last_occupancy = occupancy;
