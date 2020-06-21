@@ -126,7 +126,7 @@ void loop(){
   int newPos = encoder.getPosition();
   if (pos != newPos)
   {
-    Serial.print("Occupancy: "); Serial.print(newPos);
+    Serial.print("Pos: "); Serial.print(newPos);
     Serial.println();
     if (pos > newPos)
     {
@@ -135,7 +135,10 @@ void loop(){
     {
       occupancy++;
     }
+    Serial.print("Occupancy: "); Serial.print(occupancy);
+    Serial.println();
     pos = newPos;
+
     //set barriers on occupancy
     if ( 0 >= occupancy )
     {
@@ -152,11 +155,14 @@ void loop(){
       last_occupancy = occupancy;
     }
     tft.println(occupancy);
+    // update LEDs
     change_to_push=true;
     last = now;
     last_occupancy = occupancy;
   }
 
+  // wait at least 3 seconds since last change before pushing to firebase
+  // if firebase gets updated too often it will cost a lot of money
   now=millis();
   if (now - last >= 3000 && change_to_push)
   {
