@@ -110,21 +110,23 @@ void setup()
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(led_brightness);
 
+  
   tft.begin();
-  tft.setCursor(35, 10);
+  tft.setRotation(2);
+  tft.setCursor(35, 42);
   tft.setTextColor(WHITE, BLACK);
   tft.setTextSize(5);
   tft.println(occupancy);
-  tft.setCursor(8, 42);
+  tft.setCursor(8, 67);
   tft.println("----");
-  tft.setCursor(20, 75);
+  tft.setCursor(35, 95);
   tft.println(capacity);
 
   hue = map(occupancy, 0, capacity, 171, 0);
   CHSV color = CHSV(hue, 255, 255);
   fill_solid(leds, NUM_LEDS, color);
   FastLED.show();
-  
+
   // WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   // Serial.print("Connecting to Wi-Fi");
   // while (WiFi.status() != WL_CONNECTED)
@@ -173,11 +175,11 @@ void loop()
     {
       occupancy = capacity;
     }
-    tft.setCursor(35, 10);
+    tft.setCursor(35, 42);
     // used to detect when occupancy has grown by one digit ( e.g. 10 -> 9 ) and occupancy has to be wiped from the LCD
     if (occupancy == 9 && last_occupancy == 10 || occupancy == 99 && last_occupancy == 100)
     {
-      tft.fillRect(0, 10, tft.width(), 40, BLACK);
+      tft.fillRect(35, 42, tft.width(), 42, BLACK);
       last_occupancy = occupancy;
     }
     tft.println(occupancy);
