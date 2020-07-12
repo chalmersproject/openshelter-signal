@@ -1,18 +1,18 @@
 //when encoder clk triggers
-  // counter + or -
-  // if counter % 2 == 0          //the rotary encoder counts twice per "bump"
-    //update occupancy(counter/2) //so I just count 2 jumps as 1
-    //update tft(occupancy)
-    //update led(occupancy)
+// counter + or -
+// if counter % 2 == 0          //the rotary encoder counts twice per "bump"
+//update occupancy(counter/2) //so I just count 2 jumps as 1
+//update tft(occupancy)
+//update led(occupancy)
 
 //in main loop
-  //if occupancy is different from last_occupancy
-    // change_to_push=true
-    // firebase_upload_countdown_start=now
-    // if (now - firebase_upload_countdown_start > 4000 && change_to_push == true)
-        // upload to firebase
-        // firebase_upload_countdown_start=now
-        // change_to_push = false
+//if occupancy is different from last_occupancy
+// change_to_push=true
+// firebase_upload_countdown_start=now
+// if (now - firebase_upload_countdown_start > 4000 && change_to_push == true)
+// upload to firebase
+// firebase_upload_countdown_start=now
+// change_to_push = false
 
 //////////////////////////////////////////////////////////
 //                     Includes                         //
@@ -90,8 +90,10 @@ FirebaseJsonObject jsonParseResult;
 // flag to mark when the dial has been moved. Calls the LEDs, LCD, and push_to_firebase functions
 bool change_to_push = false;
 
-void ICACHE_RAM_ATTR encoder_change_trigger() {
+void ICACHE_RAM_ATTR encoder_change_trigger()
+{
   encoder.tick();
+  Serial.println("interrupt triggered!");
 }
 void setup()
 {
@@ -118,6 +120,11 @@ void setup()
   tft.setCursor(20, 75);
   tft.println(capacity);
 
+  hue = map(occupancy, 0, capacity, 171, 0);
+  CHSV color = CHSV(hue, 255, 255);
+  fill_solid(leds, NUM_LEDS, color);
+  FastLED.show();
+  
   // WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   // Serial.print("Connecting to Wi-Fi");
   // while (WiFi.status() != WL_CONNECTED)
@@ -133,56 +140,61 @@ void setup()
   // Serial.println("Firebase Connnected");
 }
 
-unsigned long now,last;
-void loop(){
+unsigned long now, last;
+void loop()
+{
   static int pos = 0;
 
   int newPos = encoder.getPosition();
   if (pos != newPos)
   {
-    Serial.print("Pos: "); Serial.print(newPos);
+    Serial.print("Pos: ");
+    Serial.print(newPos);
     Serial.println();
     if (pos > newPos)
     {
       occupancy--;
-    } else if ( newPos > pos)
+    }
+    else if (newPos > pos)
     {
       occupancy++;
     }
-    Serial.print("Occupancy: "); Serial.print(occupancy);
+    Serial.print("Occupancy: ");
+    Serial.print(occupancy);
     Serial.println();
     pos = newPos;
 
     //set barriers on occupancy
-    if ( 0 >= occupancy )
+    if (0 >= occupancy)
     {
       occupancy = 0;
-    } else if ( occupancy >= capacity )
+    }
+    else if (occupancy >= capacity)
     {
       occupancy = capacity;
     }
     tft.setCursor(35, 10);
     // used to detect when occupancy has grown by one digit ( e.g. 10 -> 9 ) and occupancy has to be wiped from the LCD
-    if ( occupancy == 9 && last_occupancy == 10 || occupancy == 99 && last_occupancy == 100 )
+    if (occupancy == 9 && last_occupancy == 10 || occupancy == 99 && last_occupancy == 100)
     {
-      tft.fillRect( 0, 10 , tft.width() , 40 , BLACK );
+      tft.fillRect(0, 10, tft.width(), 40, BLACK);
       last_occupancy = occupancy;
     }
     tft.println(occupancy);
     // update LEDs
     hue = map(occupancy, 0, capacity, 171, 0);
     CHSV color = CHSV(hue, 255, 255);
-    fill_solid(leds,NUM_LEDS, color);
+    fill_solid(leds, NUM_LEDS, color);
     FastLED.show();
 
-    change_to_push=true;
+    change_to_push = true;
     last = now;
     last_occupancy = occupancy;
   }
 
   // wait at least 3 seconds since last change before pushing to firebase
   // if firebase gets updated too often it will cost a lot of money
-  now=millis();
+  now = millis();
   if (now - last >= 3000 && change_to_push)
   {
     // if(Firebase.setInt(firebaseData, path_firecode_occupancy, occupancy))
@@ -194,6 +206,6 @@ void loop(){
     //   Serial.println("REASON: " + firebaseData.errorReason());
     //   delay(1000);
     // }
-    change_to_push=false;
+    change_to_push = false;
   }
 }
