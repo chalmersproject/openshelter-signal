@@ -127,19 +127,19 @@ void setup()
   fill_solid(leds, NUM_LEDS, color);
   FastLED.show();
 
-  // WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  // Serial.print("Connecting to Wi-Fi");
-  // while (WiFi.status() != WL_CONNECTED)
-  // {
-  //     Serial.print(".");
-  //     delay(300);
-  // }
-  // Serial.println(); Serial.print("Connected with IP: ");
-  // Serial.println(WiFi.localIP()); Serial.println();
-  //
-  // Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
-  // Firebase.reconnectWiFi(true);
-  // Serial.println("Firebase Connnected");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED)
+  {
+      Serial.print(".");
+      delay(300);
+  }
+  Serial.println(); Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP()); Serial.println();
+  
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  Firebase.reconnectWiFi(true);
+  Serial.println("Firebase Connnected");
 }
 
 unsigned long now, last;
@@ -199,15 +199,15 @@ void loop()
   now = millis();
   if (now - last >= 3000 && change_to_push)
   {
-    // if(Firebase.setInt(firebaseData, path_firecode_occupancy, occupancy))
-    // {
-    //   Serial.println("Updating Firebase!!");
-    // }
-    // else
-    // {
-    //   Serial.println("REASON: " + firebaseData.errorReason());
-    //   delay(1000);
-    // }
+    if(Firebase.setInt(firebaseData, path_firecode_occupancy, occupancy))
+    {
+      Serial.println("Updating Firebase!!");
+    }
+    else
+    {
+      Serial.println("REASON: " + firebaseData.errorReason());
+      delay(1000);
+    }
     change_to_push = false;
   }
 }
