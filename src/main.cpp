@@ -6,6 +6,7 @@ The Chalmers Signal Occuapncy Device is a client tally counter
 for shelter reception staff. 
 
 Written an Maintained by : Zachary Donsky zach@chalmerscards.com
+F/OSS under M.I.T License
 */
 
 
