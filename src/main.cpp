@@ -33,6 +33,19 @@
 #include <FastLED.h>
 
 //////////////////////////////////////////////////////////
+//                    Toggles                           //
+//////////////////////////////////////////////////////////
+// some chalmers signals have red-pcb 1.44" displays from creatron
+// others use the cheaper blue-pcb 1.44" displays from aliexpress
+static int display_color = 1; //(blue_pcb = 1; red_pcb = 2)
+
+// for debugging it's useful to turn off the chalmer signal's internet-y abilities. That way we can do things like make changes with it's interface without waiting for it to connect to the internet
+static bool enable_internet = false;
+
+// earlier versions of chalmers signals don't have their button attached to the ESP. It's useful to be able to quickly turn off all features of the chalmers signal that use this button.
+static bool has_button = false;
+
+//////////////////////////////////////////////////////////
 //             Globals and Utilities                    //
 //////////////////////////////////////////////////////////
 
@@ -45,6 +58,10 @@
 RotaryEncoder encoder(5, 4);
 
 //TFT Globals
+// displays from creatron and aliexpress require different coordinates
+#define y1 ((display_color == 1) ? 18 : 42) //top left of top digit
+#define y2 ((display_color == 1) ? 48 : 67) //top left of divider line
+#define y3 ((display_color == 1) ? 78 : 95) //top left of bottom digit
 #define __DC 0
 #define __CS 2
 // Color definitions
@@ -110,16 +127,15 @@ void setup()
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(led_brightness);
 
-  
   tft.begin();
   tft.setRotation(2);
-  tft.setCursor(35, 42);
+  tft.setCursor(35, y1);
   tft.setTextColor(WHITE, BLACK);
   tft.setTextSize(5);
   tft.println(occupancy);
-  tft.setCursor(8, 67);
+  tft.setCursor(8, y2);
   tft.println("----");
-  tft.setCursor(35, 95);
+  tft.setCursor(35, y3);
   tft.println(capacity);
 
   hue = map(occupancy, 0, capacity, 171, 0);
@@ -127,19 +143,23 @@ void setup()
   fill_solid(leds, NUM_LEDS, color);
   FastLED.show();
 
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print("Connecting to Wi-Fi");
-  while (WiFi.status() != WL_CONNECTED)
+  if (enable_internet == true)
   {
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    Serial.print("Connecting to Wi-Fi");
+    while (WiFi.status() != WL_CONNECTED)
+    {
       Serial.print(".");
       delay(300);
+    }
+    Serial.println();
+    Serial.print("Connected with IP: ");
+    Serial.println(WiFi.localIP());
+    Serial.println();
+    Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+    Firebase.reconnectWiFi(true);
+    Serial.println("Firebase Connnected");
   }
-  Serial.println(); Serial.print("Connected with IP: ");
-  Serial.println(WiFi.localIP()); Serial.println();
-  
-  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
-  Firebase.reconnectWiFi(true);
-  Serial.println("Firebase Connnected");
 }
 
 unsigned long now, last;
@@ -175,11 +195,11 @@ void loop()
     {
       occupancy = capacity;
     }
-    tft.setCursor(35, 42);
+    tft.setCursor(35, y1);
     // used to detect when occupancy has grown by one digit ( e.g. 10 -> 9 ) and occupancy has to be wiped from the LCD
     if (occupancy == 9 && last_occupancy == 10 || occupancy == 99 && last_occupancy == 100)
     {
-      tft.fillRect(35, 42, tft.width(), 42, BLACK);
+      tft.fillRect(35, y1, tft.width(), (y2 - 5), BLACK);
       last_occupancy = occupancy;
     }
     tft.println(occupancy);
@@ -199,7 +219,7 @@ void loop()
   now = millis();
   if (now - last >= 3000 && change_to_push)
   {
-    if(Firebase.setInt(firebaseData, path_firecode_occupancy, occupancy))
+    if (Firebase.setInt(firebaseData, path_firecode_occupancy, occupancy))
     {
       Serial.println("Updating Firebase!!");
     }
