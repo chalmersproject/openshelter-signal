@@ -9,7 +9,6 @@ Written an Maintained by : Zachary Donsky zach@chalmerscards.com
 F/OSS under M.I.T License
 */
 
-
 //////////////////////////////////////////////////////////
 //                     Includes                         //
 //////////////////////////////////////////////////////////
@@ -31,7 +30,7 @@ F/OSS under M.I.T License
 //////////////////////////////////////////////////////////
 //                    Toggles                           //
 //////////////////////////////////////////////////////////
- 
+
 // The properties fo the shelter this chalmers signal is for. Defines occupancy, capacity, etc.
 #include "Shelters/housing_first_strachan_house.h"
 
@@ -216,15 +215,17 @@ void loop()
   now = millis();
   if (now - last >= 3000 && change_to_push)
   {
-    if (Firebase.setInt(firebaseData, path_firecode_occupancy, occupancy))
+    if (enable_internet == true)
     {
-      Serial.println("Updating Firebase!!");
+      if (Firebase.setInt(firebaseData, path_firecode_occupancy, occupancy))
+      {
+        Serial.println("Updating Firebase!!");
+      }
+      else
+      {
+        Serial.println("REASON: " + firebaseData.errorReason());
+        delay(1000);
+      }
+      change_to_push = false;
     }
-    else
-    {
-      Serial.println("REASON: " + firebaseData.errorReason());
-      delay(1000);
-    }
-    change_to_push = false;
-  }
 }
