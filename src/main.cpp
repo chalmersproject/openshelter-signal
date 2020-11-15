@@ -47,6 +47,7 @@ static bool has_button = false;
 //////////////////////////////////////////////////////////
 //                    Globals                           //
 //////////////////////////////////////////////////////////
+int occupancy,capacity;
 
 //Rotary Encoder Global Variables
 #define inputCLK 4
@@ -228,4 +229,5 @@ void loop()
       }
       change_to_push = false;
     }
+  }
 }
