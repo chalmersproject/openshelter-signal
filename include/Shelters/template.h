@@ -9,11 +9,11 @@ String friendly_name = "The best shelter in the world";
 String friendly_address = "555 Somewherin Toronto";
 
 //available space
-int firecode_occupancy = 0;
-int firecode_capacity = 100;
+int occupancy = 0;
+int capacity = 88;
 //------------------------//
-int bed_occupancy = 0;
-int bed_capacity  = 60;
+int bed_occupancy = 42;
+int bed_capacity = 60;
 
 //Client Properties
 bool adult_only = false;

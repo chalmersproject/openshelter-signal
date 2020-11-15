@@ -39,7 +39,7 @@ F/OSS under M.I.T License
 static int display_color = 1; //(blue_pcb = 1; red_pcb = 2)
 
 // for debugging it's useful to turn off the chalmer signal's internet-y abilities. That way we can do things like make changes with it's interface without waiting for it to connect to the internet
-static bool enable_internet = false;
+static bool enable_internet = true;
 
 // earlier versions of chalmers signals don't have their button attached to the ESP. It's useful to be able to quickly turn off all features of the chalmers signal that use this button.
 static bool has_button = false;
@@ -47,7 +47,6 @@ static bool has_button = false;
 //////////////////////////////////////////////////////////
 //                    Globals                           //
 //////////////////////////////////////////////////////////
-int occupancy,capacity;
 
 //Rotary Encoder Global Variables
 #define inputCLK 4
@@ -156,6 +155,15 @@ void setup()
     Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
     Firebase.reconnectWiFi(true);
     Serial.println("Firebase Connnected");
+    //if shelter info does not already exist in firebase
+    //create a json object at shelter path and push to firebase
+    if (!Firebase.getJSON(firebaseData, path))
+    {
+      Serial.println("Shelter data does not exist in firebase!");
+      Serial.println("Creating Shelter data and pushing to firebase!");
+      set_local_json();
+      write_local_to_remote();
+    }
   }
 }
 
@@ -205,7 +213,6 @@ void loop()
     CHSV color = CHSV(hue, 255, 255);
     fill_solid(leds, NUM_LEDS, color);
     FastLED.show();
-
     change_to_push = true;
     last = now;
     last_occupancy = occupancy;

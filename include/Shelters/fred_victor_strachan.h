@@ -10,11 +10,11 @@ String friendly_address = "1A Strachan Ave Toronto ON M6K 3C3";
 String path = "/Shelters/fred_victor_strachan";
 String path_firecode_occupancy = "/Shelters/fred_victor_strachan/Service_Status/Firecode_Space/Firecode_Occupancy";
 //available space
-int bed_occupancy = 42;
-int bed_capacity  = 60;
+int occupancy = 0;
+int capacity = 88;
 //------------------------//
-int firecode_capacity = 100;
-int firecode_occupancy = 42;
+int bed_occupancy = 42;
+int bed_capacity = 60;
 
 //Client Properties
 bool adult_only = false;

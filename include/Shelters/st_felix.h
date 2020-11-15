@@ -9,11 +9,11 @@ String friendly_name = "Fred Victor Strachan Respite";
 String path = "/Shelters/st_felix_augusta";
 String path_firecode_occupancy = "/Shelters/st_felix_augusta/Service_Status/Firecode_Space/Firecode_Occupancy";
 //available space
-int bed_occupancy = 42;
-int bed_capacity      = 43;
+int occupancy = 0;
+int capacity = 88;
 //------------------------//
-int firecode_capacity = 65;
-int firecode_occupancy = 42;
+int bed_occupancy = 42;
+int bed_capacity = 60;
 
 //Client Properties
 bool adult_only = false;
