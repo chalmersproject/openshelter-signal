@@ -33,7 +33,7 @@ F/OSS under M.I.T License
 //////////////////////////////////////////////////////////
  
 // The properties fo the shelter this chalmers signal is for. Defines occupancy, capacity, etc.
-#include "Shelters/housing_first_strachan_house.h"
+#include "Shelters/fred_victor_strachan.h"
 
 // some chalmers signals have red-pcb 1.44" displays from creatron
 // others use the cheaper blue-pcb 1.44" displays from aliexpress
