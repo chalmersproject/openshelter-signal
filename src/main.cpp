@@ -32,14 +32,17 @@ F/OSS under M.I.T License
 //////////////////////////////////////////////////////////
 
 // The properties fo the shelter this chalmers signal is for. Defines occupancy, capacity, etc.
-#include "Shelters/fred_victor_strachan.h"
+#include "Shelters/st_felix_augusta.h"
+// #include "Shelters/housing_first_strachan_house.h"
+// #include "Shelters/fred_victor_strachan.h"
+
 
 // some chalmers signals have red-pcb 1.44" displays from creatron
 // others use the cheaper blue-pcb 1.44" displays from aliexpress
-static int display_color = 1; //(blue_pcb = 1; red_pcb = 2)
+static int display_color = 2; //(blue_pcb = 1; red_pcb = 2)
 
 // for debugging it's useful to turn off the chalmer signal's internet-y abilities. That way we can do things like make changes with it's interface without waiting for it to connect to the internet
-static bool enable_internet = true;
+static bool enable_internet = false;
 
 // earlier versions of chalmers signals don't have their button attached to the ESP. It's useful to be able to quickly turn off all features of the chalmers signal that use this button.
 static bool has_button = false;
@@ -204,7 +207,7 @@ void loop()
     // used to detect when occupancy has grown by one digit ( e.g. 10 -> 9 ) and occupancy has to be wiped from the LCD
     if (occupancy == 9 && last_occupancy == 10 || occupancy == 99 && last_occupancy == 100)
     {
-      tft.fillRect(35, y1, tft.width(), (y2 - 5), BLACK);
+      tft.fillRect(35, y1, tft.width(), (y2 - 25), BLACK);
       last_occupancy = occupancy;
     }
     tft.println(occupancy);

@@ -5,7 +5,7 @@
 #define shelter_longitude -79.410792
 String phone_number = "(416) 395-0928";
 String friendly_name = "Housing First Strachan House";
-String friendly_address = "805A Wellington St W Toronto";
+String friendly_address = "805A Wellington St W Toronto ON M5V 1G8";
 
 String shelter_name = "housing_first_strachan_house";
 String path = "/Shelters/" + shelter_name;
