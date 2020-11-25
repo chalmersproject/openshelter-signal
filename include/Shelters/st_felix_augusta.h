@@ -4,7 +4,7 @@
 #define shelter_latitude 43.6492
 #define shelter_longitude -79.3995
 String phone_number = "4162031624";
-String friendly_name = "Fred Victor Strachan Respite";
+String friendly_name = "St Felix Augusta";
 String friendly_address = "25 Augusta Ave Toronto ON M5T 2K7";
 String path = "/Shelters/st_felix_augusta";
 String path_firecode_occupancy = "/Shelters/st_felix_augusta/Service_Status/Firecode_Space/Firecode_Occupancy";
