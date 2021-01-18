@@ -9,4 +9,4 @@
 
 #secrets SSIDs and passwds
 include/credentials.h
-
+include/shelter_secrets.h
