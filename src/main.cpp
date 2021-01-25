@@ -69,27 +69,7 @@ int capacity = 90;
 #define inputDT 5
 RotaryEncoder encoder(5, 4);
 
-//
-// TFT Globals
-//
-// displays from creatron and aliexpress require different coordinates
-#define y1 ((display_color == 1) ? 18 : 42) //top left of top digit
-#define y2 ((display_color == 1) ? 48 : 67) //top left of divider line
-#define y3 ((display_color == 1) ? 78 : 95) //top left of bottom digit
-#define __DC 0
-#define __CS 2
-// Color definitions
-#define BLACK 0x0000
-#define BLUE 0x001F
-#define RED 0xF800
-#define GREEN 0x07E0
-#define CYAN 0x07FF
-#define MAGENTA 0xF81F
-#define YELLOW 0xFFE0
-#define WHITE 0xFFFF
-//instatiate TFT!
-TFT_ILI9163C tft = TFT_ILI9163C(__CS, __DC);
-int last_MEASUREMENT; //used to detect when occupancy has grown by one digit ( e.g. 9 -> 10 ) and occupancy has to be wiped from the LCD
+#include <tft_globals.h>
 
 //
 // LED Globals
@@ -227,6 +207,55 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(4), encoder_change_trigger, CHANGE);
   attachInterrupt(digitalPinToInterrupt(5), encoder_change_trigger, CHANGE);
 
+  tft.begin();
+  tft.setRotation(2);
+  tft.setTextColor(WHITE, BLACK);
+  tft.setTextSize(2);
+  tft.setCursor(0, y2);
+  tft.println(" CHALMERS");
+  tft.setTextSize(3);
+  tft.println(" SIGNAL");
+
+  if ( enable_internet == true)
+  {
+    initWifi();
+    // HTTPClient http;
+    client.setInsecure();
+
+    if (WiFi.status() == WL_CONNECTED)
+    {
+      tft.clearScreen(BLACK);
+      tft.setTextSize(2);
+      tft.setTextSize(2);
+      tft.setCursor(0, y2);
+      tft.println("   Wi-Fi");
+      tft.println(" CONNECTED!");
+      delay(4000);
+    }
+    
+    // TODO:
+    // verify connection to api.chalmersproject.com
+    //
+
+  }
+  
+  // 
+  // setup display with occupancy / capacity
+  // 
+  tft.clearScreen(BLACK);
+  tft.setRotation(2);
+  tft.setCursor(35, y1);
+  tft.setTextColor(WHITE, BLACK);
+  tft.setTextSize(5);
+  tft.println(_MEASUREMENT);
+  tft.setCursor(8, y2);
+  tft.println("----");
+  tft.setCursor(35, y3);
+  tft.println(capacity);
+
+  //
+  // start LED with color of occupancy / capacity
+  //
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(led_brightness);
 
@@ -235,23 +264,6 @@ void setup()
   fill_solid(leds, NUM_LEDS, color);
   FastLED.show();
 
-  tft.begin();
-  tft.setRotation(2);
-  tft.setTextColor(WHITE, BLACK);
-  tft.setTextSize(3);
-  tft.println("CHALMERS");
-  tft.println("SIGNAL");
-
-  initWifi();
-  // HTTPClient http;
-  client.setInsecure();
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    tft.clearScreen(BLACK);
-    tft.println("CONNECTED!");
-    delay(4000);
-    tft.clearScreen(BLACK);
-  }
 }
 
 unsigned long now, last;
