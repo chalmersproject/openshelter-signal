@@ -137,7 +137,7 @@ void setup()
   tft.setCursor(35, y3);
   tft.println(capacity);
 
-  hue = map(occupancy, 0, capacity, 171, 0);
+  hue = map(occupancy, 0, capacity, 90, 0);
   CHSV color = CHSV(hue, 255, 255);
   fill_solid(leds, NUM_LEDS, color);
   FastLED.show();
@@ -212,7 +212,7 @@ void loop()
     }
     tft.println(occupancy);
     // update LEDs
-    hue = map(occupancy, 0, capacity, 171, 0);
+    hue = map(occupancy, 0, capacity, 90, 0);
     CHSV color = CHSV(hue, 255, 255);
     fill_solid(leds, NUM_LEDS, color);
     FastLED.show();
