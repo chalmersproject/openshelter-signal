@@ -59,15 +59,15 @@ static bool has_button = false;
 //
 // Measured occupancy value from the chalmers signal
 //
-int _MEASUREMENT = 15;
+int occupancy = 15;
 int capacity = 90;
-
+int last_occupancy;
 //
 // Rotary Encoder Global Variables
 //
 #define inputCLK 4 // pin
 #define inputDT 5
-RotaryEncoder encoder(5, 4);
+    RotaryEncoder encoder(5, 4);
 
 #include <tft_globals.h>
 
@@ -132,12 +132,12 @@ reqJson = {
 const char *_API_HOST = "https://api.chalmersproject.com/graphql";
 // Attempting to do a multi-line variable declaration: HOWTO?
 const char *MUTATION = "           \
-mutation MeasureShelterOccupancy(  \
+mutation CreateSignalMeasurement(  \
   $signalId: ID!                   \
   $signalSecret: String!           \
   $measurement: Int!               \
 ) {                                \
-  measureShelterOccupancy(         \
+  createSignalMeasurement(         \
     input: {                       \
       signalId: $signalId          \
       signalSecret: $signalSecret  \
@@ -150,6 +150,15 @@ mutation MeasureShelterOccupancy(  \
   }                                \
 }";
 
+const char *value = "              \
+query CheckSignalMeasurement(      \
+  $signalId: ID!                   \
+) {                                \
+    signal(id: $signalId)  {       \
+      value                        \
+    }                              \
+}";
+
 typedef struct graphqlQuery
 {
   char req[REQBUFF_SIZE];
@@ -159,7 +168,7 @@ typedef struct graphqlQuery
 } GraphqlQuery;
 
 // HTTP POST to chalmersproject API
-void occupancy_request(WiFiClientSecure client, int _MEASUREMENT)
+void occupancy_request(WiFiClientSecure client, int occupancy)
 {
   // GraphqlQuery *graphql = (GraphqlQuery *)malloc(sizeof(GraphqlQuery));
   HTTPClient http;
@@ -167,7 +176,7 @@ void occupancy_request(WiFiClientSecure client, int _MEASUREMENT)
   DynamicJsonDocument varJson(1024);
   varJson["signalId"] = SIGNAL_ID;
   varJson["signalSecret"] = SIGNAL_SECRET;
-  varJson["measurement"] = _MEASUREMENT;
+  varJson["measurement"] = occupancy;
 
   Serial.println("Sending HTTP POST");
   http.begin(client, _API_HOST);
@@ -212,7 +221,7 @@ void setup()
   tft.setTextColor(WHITE, BLACK);
   tft.setTextSize(2);
   tft.setCursor(0, y2);
-  tft.println(" CHALMERS");
+  tft.println("CHALMERS");
   tft.setTextSize(3);
   tft.println(" SIGNAL");
 
@@ -229,7 +238,7 @@ void setup()
       tft.setTextSize(2);
       tft.setCursor(0, y2);
       tft.println("   Wi-Fi");
-      tft.println(" CONNECTED!");
+      tft.println(" CONNECTED");
       delay(4000);
     }
     
@@ -247,7 +256,7 @@ void setup()
   tft.setCursor(35, y1);
   tft.setTextColor(WHITE, BLACK);
   tft.setTextSize(5);
-  tft.println(_MEASUREMENT);
+  tft.println(occupancy);
   tft.setCursor(8, y2);
   tft.println("----");
   tft.setCursor(35, y3);
@@ -259,7 +268,7 @@ void setup()
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(led_brightness);
 
-  hue = map(_MEASUREMENT, 0, capacity, 171, 0);
+  hue = map(occupancy, 0, capacity, 90, 0);
   CHSV color = CHSV(hue, 255, 255);
   fill_solid(leds, NUM_LEDS, color);
   FastLED.show();
@@ -280,42 +289,42 @@ void loop()
     Serial.println();
     if (pos > newPos)
     {
-      _MEASUREMENT--;
+      occupancy--;
     }
     else if (newPos > pos)
     {
-      _MEASUREMENT++;
+      occupancy++;
     }
-    Serial.print("_MEASUREMENT: ");
-    Serial.print(_MEASUREMENT);
+    Serial.print("occupancy: ");
+    Serial.print(occupancy);
     Serial.println();
     pos = newPos;
 
-    //set barriers on _MEASUREMENT
-    if (0 >= _MEASUREMENT)
+    //set barriers on occupancy
+    if (0 >= occupancy)
     {
-      _MEASUREMENT = 0;
+      occupancy = 0;
     }
-    else if (_MEASUREMENT >= capacity)
+    else if (occupancy >= capacity)
     {
-      _MEASUREMENT = capacity;
+      occupancy = capacity;
     }
     tft.setCursor(35, y1);
-    // used to detect when _MEASUREMENT has grown by one digit ( e.g. 10 -> 9 ) and _MEASUREMENT has to be wiped from the LCD
-    if (_MEASUREMENT == 9 && last_MEASUREMENT == 10 || _MEASUREMENT == 99 && last_MEASUREMENT == 100)
+    // used to detect when occupancy has grown by one digit ( e.g. 10 -> 9 ) and occupancy has to be wiped from the LCD
+    if (occupancy == 9 && last_occupancy == 10 || occupancy == 99 && last_occupancy == 100)
     {
       tft.fillRect(35, y1, tft.width(), (y2 - 25), BLACK);
-      last_MEASUREMENT = _MEASUREMENT;
+      last_occupancy = occupancy;
     }
-    tft.println(_MEASUREMENT);
+    tft.println(occupancy);
     // update LEDs
-    hue = map(_MEASUREMENT, 0, capacity, 171, 0);
+    hue = map(occupancy, 0, capacity, 90, 0);
     CHSV color = CHSV(hue, 255, 255);
     fill_solid(leds, NUM_LEDS, color);
     FastLED.show();
     change_to_push = true;
     last = now;
-    last_MEASUREMENT = _MEASUREMENT;
+    last_occupancy = occupancy;
   }
 
   //
@@ -326,7 +335,8 @@ void loop()
   {
     if (enable_internet == true)
     {
-      occupancy_request(client, _MEASUREMENT);
+      Serial.println("pushing to api.chalmersproject.com");
+      occupancy_request(client, occupancy);
       change_to_push = false;
     }
   }
