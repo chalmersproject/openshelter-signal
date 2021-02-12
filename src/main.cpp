@@ -44,7 +44,7 @@ F/OSS under M.I.T License
 
 // some chalmers signals have red-pcb 1.44" displays from creatron
 // others use the cheaper blue-pcb 1.44" displays from aliexpress
-static int display_color = 2; //(blue_pcb = 1; red_pcb = 2)
+static int display_color = 1; //(blue_pcb = 1; red_pcb = 2)
 
 // for debugging it's useful to turn off the chalmer signal's internet-y abilities. That way we can do things like make changes with it's interface without waiting for it to connect to the internet
 static bool enable_internet = true;
@@ -131,7 +131,7 @@ reqJson = {
 
 const char *_API_HOST = "https://api.chalmersproject.com/graphql";
 // Attempting to do a multi-line variable declaration: HOWTO?
-const char *MUTATION = "           \
+const char *PUSH = "           \
 mutation CreateSignalMeasurement(  \
   $signalId: ID!                   \
   $signalSecret: String!           \
@@ -150,7 +150,7 @@ mutation CreateSignalMeasurement(  \
   }                                \
 }";
 
-const char *value = "              \
+const char *PULL = "              \
 query CheckSignalMeasurement(      \
   $signalId: ID!                   \
 ) {                                \
@@ -168,12 +168,14 @@ typedef struct graphqlQuery
 } GraphqlQuery;
 
 // HTTP POST to chalmersproject API
-void occupancy_request(WiFiClientSecure client, int occupancy)
+void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pull)
 {
   // GraphqlQuery *graphql = (GraphqlQuery *)malloc(sizeof(GraphqlQuery));
   HTTPClient http;
   DynamicJsonDocument reqJson(1024);
   DynamicJsonDocument varJson(1024);
+  DynamicJsonDocument resJson(1024);
+
   varJson["signalId"] = SIGNAL_ID;
   varJson["signalSecret"] = SIGNAL_SECRET;
   varJson["measurement"] = occupancy;
@@ -181,7 +183,9 @@ void occupancy_request(WiFiClientSecure client, int occupancy)
   Serial.println("Sending HTTP POST");
   http.begin(client, _API_HOST);
   http.addHeader("Content-Type", "application/json");
-  reqJson["query"] = MUTATION;
+
+  varJson["signalId"] = SIGNAL_ID;
+  reqJson["query"] = (push_or_pull == "push") ? PUSH : PULL ;
   reqJson["variables"] = varJson;
 
   String request;
@@ -191,6 +195,12 @@ void occupancy_request(WiFiClientSecure client, int occupancy)
 
   http.POST(request);
 
+  // if ( push_or_pull == "pull" )
+  // {
+  //   deserializeJson( resJson, http.getStream() );
+  //   Serial.print(" Response Int: ");
+  //   Serial.println( resJson["data.signal.value"].as<int>());
+  // }
   Serial.print("Response: ");
   Serial.println(http.getString());
 }
@@ -240,6 +250,8 @@ void setup()
       tft.println("   Wi-Fi");
       tft.println(" CONNECTED");
       delay(4000);
+
+      occupancy_request(client, occupancy, "pull");
     }
     
     // TODO:
@@ -336,7 +348,7 @@ void loop()
     if (enable_internet == true)
     {
       Serial.println("pushing to api.chalmersproject.com");
-      occupancy_request(client, occupancy);
+      occupancy_request(client, occupancy, "push");
       change_to_push = false;
     }
   }
