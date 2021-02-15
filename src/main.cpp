@@ -195,14 +195,14 @@ void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pu
 
   http.POST(request);
 
-  // if ( push_or_pull == "pull" )
-  // {
-  //   deserializeJson( resJson, http.getStream() );
-  //   Serial.print(" Response Int: ");
-  //   Serial.println( resJson["data.signal.value"].as<int>());
-  // }
-  Serial.print("Response: ");
-  Serial.println(http.getString());
+  if ( push_or_pull == "pull" )
+  {
+    deserializeJson( resJson, http.getStream() );
+    Serial.print(" Response Int: ");
+    Serial.println(resJson["data"]["signal"]["value"].as<int>());
+  }
+  // Serial.print("Response: ");
+  // Serial.println( resJson.getElement );
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    Rotary Encoder Interrupt                                           //
