@@ -131,7 +131,7 @@ reqJson = {
 
 const char *_API_HOST = "https://api.chalmersproject.com/graphql";
 // Attempting to do a multi-line variable declaration: HOWTO?
-const char *PUSH = "           \
+const char *PUSH = "               \
 mutation CreateSignalMeasurement(  \
   $signalId: ID!                   \
   $signalSecret: String!           \
@@ -150,7 +150,7 @@ mutation CreateSignalMeasurement(  \
   }                                \
 }";
 
-const char *PULL = "              \
+const char *PULL = "               \
 query CheckSignalMeasurement(      \
   $signalId: ID!                   \
 ) {                                \
@@ -181,7 +181,7 @@ void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pu
   varJson["measurement"] = occupancy;
 
   Serial.println("Sending HTTP POST");
-  http.begin(client, _API_HOST);
+  http.begin(client, _API_HOST); 
   http.addHeader("Content-Type", "application/json");
 
   varJson["signalId"] = SIGNAL_ID;
@@ -314,7 +314,7 @@ void loop()
 
     //set barriers on occupancy
     if (0 >= occupancy)
-    {
+    { 
       occupancy = 0;
     }
     else if (occupancy >= capacity)
