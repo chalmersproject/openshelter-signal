@@ -24,7 +24,7 @@ F/OSS under M.I.T License
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h> // create TLS connection
-
+#include <WiFiManager.h>
 //LED
 #include <FastLED.h>
 
@@ -46,8 +46,8 @@ F/OSS under M.I.T License
 // others use the cheaper blue-pcb 1.44" displays from aliexpress
 static int display_color = 1; //(blue_pcb = 1; red_pcb = 2)
 
-// for debugging it's useful to turn off the chalmer signal's internet-y abilities. That way we can do things like make changes with it's interface without waiting for it to connect to the internet
-static bool enable_internet = true;
+// for debugging it's useful to turn off the chalmers signal's internet-y abilities. That way we can do things like make changes with it's interface without waiting for it to connect to the internet
+static bool enable_internet = false;
 
 // earlier versions of chalmers signals don't have their button attached to the ESP. It's useful to be able to quickly turn off all features of the chalmers signal that use this button.
 static bool has_button = false;
