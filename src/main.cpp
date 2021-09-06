@@ -47,7 +47,7 @@ F/OSS under M.I.T License
 static int display_color = 1; //(blue_pcb = 1; red_pcb = 2)
 
 // for debugging it's useful to turn off the chalmers signal's internet-y abilities. That way we can do things like make changes with it's interface without waiting for it to connect to the internet
-static bool enable_internet = false;
+static bool enable_internet = true;
 
 // earlier versions of chalmers signals don't have their button attached to the ESP. It's useful to be able to quickly turn off all features of the chalmers signal that use this button.
 static bool has_button = false;
@@ -91,13 +91,29 @@ void initWifi()
   WiFi.mode(WIFI_STA);
   WiFi.begin(_WIFI_SSID, _WIFI_PWD);
 
-  Serial.println("Connecting..");
-  while (WiFi.status() != WL_CONNECTED)
+  // https://github.com/tzapu/WiFiManager/blob/master/examples/Basic/Basic.ino
+  // WiFiManager, Local intialization. Once its business is done, there is no need to keep it around  
+  WiFiManager wm;
+
+  bool res;
+  res = wm.autoConnect("Chalmers-Signal", "fart"); // password protected ap
+  if (!res)
   {
-    delay(500);
-    Serial.println(".");
+    Serial.println("Failed to connect");
+    // ESP.restart();
   }
-  Serial.printf("SSID: %s\nIP: %s\n", _WIFI_SSID, WiFi.localIP().toString().c_str());
+  else
+  {
+    //if you get here you have connected to the WiFi
+    Serial.println("connected...yeey :)");
+  }
+  // Serial.println("Connecting..");
+  // while (WiFi.status() != WL_CONNECTED)
+  // {
+  //   delay(500);
+  //   Serial.println(".");
+  // }
+  // Serial.printf("SSID: %s\nIP: %s\n", _WIFI_SSID, WiFi.localIP().toString().c_str());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +145,7 @@ reqJson = {
 #define VARBUFF_SIZE 256
 #define RESPBUFF_SIZE 2048
 
-const char *_API_HOST = "https://api.chalmersproject.com/graphql";
+const char *_API_HOST = "https://api.cloud.chalmersproject.com/graphql";
 // Attempting to do a multi-line variable declaration: HOWTO?
 const char *PUSH = "               \
 mutation CreateSignalMeasurement(  \
