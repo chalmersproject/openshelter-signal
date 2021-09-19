@@ -1,6 +1,6 @@
 # Chalmers Signal Occupancy
 
-This repository is for organization and work on the Chalmers-Signal-Occupancy device firmware.x
+This repository is for organization and work on the The Open-Shelter (pron. Chalmers Signal) Occupancy device firmware.x
 
 ## Quick Start
 Setting up a development environment for this firmware is easiest with Platform IO.
