@@ -38,6 +38,15 @@ F/OSS under M.I.T License
 //
 #include <shelter_secrets.h>
 
+//GUISlice
+#include "FreeSans9pt7b.h"
+#include "FreeSans18pt7b.h"
+#include "FreeSansBold9pt7b.h"
+#include "TFT_eSPI.h"
+#include "GUIsliceProjects/GUIsliceProjects_GSLC.h"
+#include "guislice_init.h"
+// #include "guislice_callbacks.h"
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    Toggles                                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -300,7 +309,12 @@ void setup()
   CHSV color = CHSV(hue, 255, 255);
   fill_solid(leds, NUM_LEDS, color);
   FastLED.show();
+  gslc_InitDebug(&DebugOut);
 
+  // ------------------------------------------------
+  // Create graphic elements
+  // ------------------------------------------------
+  InitGUIslice_gen();
 }
 
 unsigned long now, last;
