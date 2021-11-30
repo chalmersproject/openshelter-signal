@@ -351,6 +351,28 @@ void loop()
     {
       occupancy = capacity;
     }
+    //
+    // Update OCCUPANCY and CAPACITY GUI numbers
+    //
+    char string_to_write[MAX_STR];
+
+    snprintf(string_to_write, MAX_STR, "%u", occupancy);
+    gslc_ElemSetTxtStr(&m_gui, m_pElemVal2, string_to_write);
+
+    // snprintf(string_to_write, MAX_STR, "%u", capacity);
+    // gslc_ElemSetTxtStr(&m_gui, m_pElemVal2_3, string_to_write);
+
+    //
+    // Update GUISlice gauge
+    //
+    int gauge_pos = map(occupancy, 0, capacity, 0, 100);
+    gslc_ElemXRingGaugeSetVal(&m_gui, m_pElemXRingGauge1, gauge_pos);
+
+    // ------------------------------------------------
+    // Periodically call GUIslice update function
+    // ------------------------------------------------
+    gslc_Update(&m_gui);
+
     tft.setCursor(35, y1);
     // used to detect when occupancy has grown by one digit ( e.g. 10 -> 9 ) and occupancy has to be wiped from the LCD
     if (occupancy == 9 && last_occupancy == 10 || occupancy == 99 && last_occupancy == 100)
