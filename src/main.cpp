@@ -16,8 +16,8 @@ F/OSS under M.I.T License
 
 //display
 #include <SPI.h>
-#include <TFT_ILI9163C.h>
-#include <Adafruit_GFX.h>
+// #include <TFT_ILI9163C.h>
+// #include <Adafruit_GFX.h>
 #include <RotaryEncoder.h>
 
 //WiFi and HTTPS requests
@@ -39,10 +39,10 @@ F/OSS under M.I.T License
 #include <shelter_secrets.h>
 
 //GUISlice
-#include "FreeSans9pt7b.h"
-#include "FreeSans18pt7b.h"
-#include "FreeSansBold9pt7b.h"
-#include "TFT_eSPI.h"
+// #include "FreeSans9pt7b.h"
+// #include "FreeSans18pt7b.h"
+// #include "FreeSansBold9pt7b.h"
+// #include "TFT_eSPI.h"
 #include "GUIsliceProjects/GUIsliceProjects_GSLC.h"
 #include "guislice_init.h"
 // #include "guislice_callbacks.h"
@@ -78,7 +78,7 @@ int last_occupancy;
 #define inputDT 5
 RotaryEncoder encoder(5, 4);
 
-#include <tft_globals.h>
+// #include <tft_globals.h>
 
 //
 // LED Globals
@@ -251,14 +251,14 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(4), encoder_change_trigger, CHANGE);
   attachInterrupt(digitalPinToInterrupt(5), encoder_change_trigger, CHANGE);
 
-  tft.begin();
-  tft.setRotation(2);
-  tft.setTextColor(WHITE, BLACK);
-  tft.setTextSize(2);
-  tft.setCursor(0, y2);
-  tft.println("CHALMERS");
-  tft.setTextSize(3);
-  tft.println(" SIGNAL");
+  // tft.begin();
+  // tft.setRotation(2);
+  // tft.setTextColor(WHITE, BLACK);
+  // tft.setTextSize(2);
+  // tft.setCursor(0, y2);
+  // tft.println("CHALMERS");
+  // tft.setTextSize(3);
+  // tft.println(" SIGNAL");
 
   if ( enable_internet == true)
   {
@@ -268,12 +268,12 @@ void setup()
 
     if (WiFi.status() == WL_CONNECTED)
     {
-      tft.clearScreen(BLACK);
-      tft.setTextSize(2);
-      tft.setTextSize(2);
-      tft.setCursor(0, y2);
-      tft.println("   Wi-Fi");
-      tft.println(" CONNECTED");
+      // tft.clearScreen(BLACK);
+      // tft.setTextSize(2);
+      // tft.setTextSize(2);
+      // tft.setCursor(0, y2);
+      // tft.println("   Wi-Fi");
+      // tft.println(" CONNECTED");
       delay(4000);
 
       occupancy_request(client, occupancy, "pull");
@@ -288,16 +288,16 @@ void setup()
   // 
   // setup display with occupancy / capacity
   // 
-  tft.clearScreen(BLACK);
-  tft.setRotation(2);
-  tft.setCursor(35, y1);
-  tft.setTextColor(WHITE, BLACK);
-  tft.setTextSize(5);
-  tft.println(occupancy);
-  tft.setCursor(8, y2);
-  tft.println("----");
-  tft.setCursor(35, y3);
-  tft.println(capacity);
+  // tft.clearScreen(BLACK);
+  // tft.setRotation(2);
+  // tft.setCursor(35, y1);
+  // tft.setTextColor(WHITE, BLACK);
+  // tft.setTextSize(5);
+  // tft.println(occupancy);
+  // tft.setCursor(8, y2);
+  // tft.println("----");
+  // tft.setCursor(35, y3);
+  // tft.println(capacity);
 
   //
   // start LED with color of occupancy / capacity
@@ -373,14 +373,14 @@ void loop()
     // ------------------------------------------------
     gslc_Update(&m_gui);
 
-    tft.setCursor(35, y1);
+    // tft.setCursor(35, y1);
     // used to detect when occupancy has grown by one digit ( e.g. 10 -> 9 ) and occupancy has to be wiped from the LCD
-    if (occupancy == 9 && last_occupancy == 10 || occupancy == 99 && last_occupancy == 100)
-    {
-      tft.fillRect(35, y1, tft.width(), (y2 - 25), BLACK);
-      last_occupancy = occupancy;
-    }
-    tft.println(occupancy);
+    // if (occupancy == 9 && last_occupancy == 10 || occupancy == 99 && last_occupancy == 100)
+    // {
+    //   tft.fillRect(35, y1, tft.width(), (y2 - 25), BLACK);
+    //   last_occupancy = occupancy;
+    // }
+    // tft.println(occupancy);
     // update LEDs
     hue = map(occupancy, 0, capacity, 90, 0);
     CHSV color = CHSV(hue, 255, 255);
