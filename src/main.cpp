@@ -5,7 +5,7 @@
 The Chalmers Signal Occuapncy Device is a client tally counter
 for shelter reception staff. 
 
-Written an Maintained by the Chalmers project info@chalmersproject.com
+Written and Maintained by the Chalmers project info@chalmersproject.com
 F/OSS under M.I.T License
 */
 
@@ -153,8 +153,9 @@ reqJson = {
 #define REQBUFF_SIZE 256
 #define VARBUFF_SIZE 256
 #define RESPBUFF_SIZE 2048
-
-const char *_API_HOST = "https://api.cloud.chalmersproject.com/graphql";
+const char *_API_HOST = "http://192.168.133.61:8080/graphql";
+// const char *_API_HOST = "https://api.cloud.chalmersproject.com/graphql";
+// const char *_API_HOST = "https://1d2b-2607-f2c0-928a-b500-64cc-e3d2-f2ad-16c7.ngrok.io/graphql";
 // Attempting to do a multi-line variable declaration: HOWTO?
 const char *PUSH = "               \
 mutation CreateSignalMeasurement(  \
@@ -184,13 +185,13 @@ query CheckSignalMeasurement(      \
     }                              \
 }";
 
-typedef struct graphqlQuery
-{
-  char req[REQBUFF_SIZE];
-  char var[VARBUFF_SIZE];
-  int status;
-  String resp;
-} GraphqlQuery;
+// typedef struct graphqlQuery
+// {
+//   char req[REQBUFF_SIZE];
+//   char var[VARBUFF_SIZE];
+//   int status;
+//   String resp;
+// } GraphqlQuery;
 
 // HTTP POST to chalmersproject API
 void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pull)
@@ -211,14 +212,19 @@ void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pu
 
   varJson["signalId"] = SIGNAL_ID;
   reqJson["query"] = (push_or_pull == "push") ? PUSH : PULL ;
+  reqJson["operationName"] = "CreateSignalMeasurement";
   reqJson["variables"] = varJson;
 
   String request;
   serializeJson(reqJson, request);
-  Serial.print("Request: ");
+  Serial.print("REQUEST: ");
   Serial.println(request);
 
-  http.POST(request);
+  int responseStatus = http.POST(request);
+  Serial.print("RESPONSE STATUS: ");
+  Serial.println(responseStatus);
+  Serial.print("RESPONSE: ");
+  Serial.println(http.getString());
 
   if ( push_or_pull == "pull" )
   {
@@ -226,9 +232,14 @@ void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pu
     Serial.print(" Response Int: ");
     Serial.println(resJson["data"]["signal"]["value"].as<int>());
   }
+
+  // Memory leaks begone :)
+  http.end();
   // Serial.print("Response: ");
   // Serial.println( resJson.getElement );
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    Rotary Encoder Interrupt                                           //
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -251,14 +262,9 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(4), encoder_change_trigger, CHANGE);
   attachInterrupt(digitalPinToInterrupt(5), encoder_change_trigger, CHANGE);
 
-  // tft.begin();
-  // tft.setRotation(2);
-  // tft.setTextColor(WHITE, BLACK);
-  // tft.setTextSize(2);
-  // tft.setCursor(0, y2);
-  // tft.println("CHALMERS");
-  // tft.setTextSize(3);
-  // tft.println(" SIGNAL");
+  // TODO
+  // chalmers START screen
+  //
 
   if ( enable_internet == true)
   {
@@ -399,7 +405,7 @@ void loop()
   {
     if (enable_internet == true)
     {
-      Serial.println("pushing to api.chalmersproject.com");
+      Serial.println("pushing to " + (String)_API_HOST + "!");
       occupancy_request(client, occupancy, "push");
       change_to_push = false;
     }
