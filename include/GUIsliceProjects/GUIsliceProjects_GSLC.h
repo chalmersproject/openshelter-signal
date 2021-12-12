@@ -114,6 +114,9 @@ static int16_t DebugOut(char ch);
 // Callback Methods
 // ------------------------------------------------
 bool CbBtnCommon(void* pvGui,void *pvElemRef,gslc_teTouch eTouch,int16_t nX,int16_t nY);
+// #ifndef CbBtnCommon
+// #error CbBtnCommon is not defined
+// #endif
 bool CbCheckbox(void* pvGui, void* pvElemRef, int16_t nSelId, bool bState);
 bool CbDrawScanner(void* pvGui,void* pvElemRef,gslc_teRedrawType eRedraw);
 bool CbKeypad(void* pvGui, void *pvElemRef, int16_t nState, void* pvData);

@@ -45,6 +45,7 @@ F/OSS under M.I.T License
 // #include "TFT_eSPI.h"
 #include "GUIsliceProjects/GUIsliceProjects_GSLC.h"
 #include "guislice_init.h"
+#include "callback_functions.h"
 // #include "guislice_callbacks.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +125,7 @@ void initWifi()
   // }
   // Serial.printf("SSID: %s\nIP: %s\n", _WIFI_SSID, WiFi.localIP().toString().c_str());
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    QUERY                                                              //
