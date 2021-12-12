@@ -21,7 +21,8 @@
 // Include any extended elements
 //<Includes !Start!>
 // Include extended elements
-#include "elem/XKeyPad_Num.h"
+// #include "elem/XKeyPad_Alpha.h"
+// #include "elem/XKeyPad_Num.h"
 #include "elem/XRingGauge.h"
 
 // Ensure optional features are enabled in the configuration
@@ -49,9 +50,10 @@
 // Enumerations for pages, elements, fonts, images
 // ------------------------------------------------
 //<Enum !Start!>
-enum {E_PG_MAIN,E_PG_WIFI_CONNECT,E_POP_KEYPAD_NUM};
+enum {E_PG_MAIN,E_PG_WIFI_CONNECT,E_POP_KEYPAD_NUM,E_POP_KEYPAD_ALPHA};
 enum {CAPACITY_NUM_MONITOR,E_DRAW_LINE1,E_ELEM_IMAGE4,E_ELEM_NUMINPUT3
-      ,E_ELEM_TEXT1,E_ELEM_TEXT2,OCCUPANCY_GAGE,E_ELEM_KEYPAD_NUM};
+      ,E_ELEM_TEXT1,E_ELEM_TEXTINPUT1,OCCUPANCY_GAGE,E_ELEM_KEYPAD_NUM
+      ,E_ELEM_KEYPAD_ALPHA};
 // Must use separate enum for fonts with MAX_FONT at end to use gslc_FontSet.
 enum {E_BUILTIN5X8,E_FREESANS18,E_FREESANS9,E_FREESANSBOLD9,MAX_FONT};
 //<Enum !End!>
@@ -64,7 +66,7 @@ enum {E_BUILTIN5X8,E_FREESANS18,E_FREESANS9,E_FREESANSBOLD9,MAX_FONT};
 // Define the maximum number of elements and pages
 // ------------------------------------------------
 //<ElementDefines !Start!>
-#define MAX_PAGE                3
+#define MAX_PAGE                4
 
 #define MAX_ELEM_PG_MAIN 5 // # Elems total on page
 #define MAX_ELEM_PG_MAIN_RAM MAX_ELEM_PG_MAIN // # Elems in RAM
@@ -88,7 +90,10 @@ gslc_tsElem                     m_asPage2Elem[MAX_ELEM_PG_WIFI_CONNECT_RAM];
 gslc_tsElemRef                  m_asPage2ElemRef[MAX_ELEM_PG_WIFI_CONNECT];
 gslc_tsElem                     m_asKeypadNumElem[1];
 gslc_tsElemRef                  m_asKeypadNumElemRef[1];
-gslc_tsXKeyPad                  m_sKeyPadNum;
+gslc_tsElem                     m_asKeypadAlphaElem[1];
+gslc_tsElemRef                  m_asKeypadAlphaElemRef[1];
+// gslc_tsXKeyPad                  m_sKeyPadNum;
+// gslc_tsXKeyPad                  m_sKeyPadAlpha;
 gslc_tsXRingGauge               m_sXRingGauge1;
 
 #define MAX_STR                 100
@@ -101,10 +106,12 @@ gslc_tsXRingGauge               m_sXRingGauge1;
 
 // Element References for direct access
 //<Extern_References !Start!>
+extern gslc_tsElemRef* m_pElemInTxt1;
 extern gslc_tsElemRef* m_pElemVal2;
 extern gslc_tsElemRef* m_pElemVal2_3;
 extern gslc_tsElemRef* m_pElemXRingGauge1;
-extern gslc_tsElemRef* m_pElemKeyPadNum;
+// extern gslc_tsElemRef* m_pElemKeyPadNum;
+// extern gslc_tsElemRef* m_pElemKeyPadAlpha;
 //<Extern_References !End!>
 
 // Define debug message function
@@ -113,10 +120,10 @@ static int16_t DebugOut(char ch);
 // ------------------------------------------------
 // Callback Methods
 // ------------------------------------------------
-bool CbBtnCommon(void* pvGui,void *pvElemRef,gslc_teTouch eTouch,int16_t nX,int16_t nY);
+// bool CbBtnCommon(void* pvGui,void *pvElemRef,gslc_teTouch eTouch,int16_t nX,int16_t nY);
 bool CbCheckbox(void* pvGui, void* pvElemRef, int16_t nSelId, bool bState);
 bool CbDrawScanner(void* pvGui,void* pvElemRef,gslc_teRedrawType eRedraw);
-bool CbKeypad(void* pvGui, void *pvElemRef, int16_t nState, void* pvData);
+// bool CbKeypad(void* pvGui, void *pvElemRef, int16_t nState, void* pvData);
 bool CbListbox(void* pvGui, void* pvElemRef, int16_t nSelId);
 bool CbSlidePos(void* pvGui,void* pvElemRef,int16_t nPos);
 bool CbSpinner(void* pvGui, void *pvElemRef, int16_t nState, void* pvData);
@@ -145,6 +152,7 @@ void InitGUIslice_gen()
   gslc_PageAdd(&m_gui,E_PG_MAIN,m_asPage1Elem,MAX_ELEM_PG_MAIN_RAM,m_asPage1ElemRef,MAX_ELEM_PG_MAIN);
   gslc_PageAdd(&m_gui,E_PG_WIFI_CONNECT,m_asPage2Elem,MAX_ELEM_PG_WIFI_CONNECT_RAM,m_asPage2ElemRef,MAX_ELEM_PG_WIFI_CONNECT);
   gslc_PageAdd(&m_gui,E_POP_KEYPAD_NUM,m_asKeypadNumElem,1,m_asKeypadNumElemRef,1);  // KeyPad
+  gslc_PageAdd(&m_gui,E_POP_KEYPAD_ALPHA,m_asKeypadAlphaElem,1,m_asKeypadAlphaElemRef,1);  // KeyPad
 
   // NOTE: The current page defaults to the first page added. Here we explicitly
   //       ensure that the main page is the correct page no matter the add order.
@@ -179,7 +187,7 @@ void InitGUIslice_gen()
   gslc_ElemSetCol(&m_gui,pElemRef,GSLC_COL_BLACK,GSLC_COL_BLACK,GSLC_COL_BLACK);
   gslc_ElemSetFrameEn(&m_gui,pElemRef,true);
   gslc_ElemSetClickEn(&m_gui, pElemRef, true);
-  gslc_ElemSetTouchFunc(&m_gui, pElemRef, &CbBtnCommon);
+  // gslc_ElemSetTouchFunc(&m_gui, pElemRef, &CbBtnCommon);
   m_pElemVal2 = pElemRef;
 
   // Create E_DRAW_LINE1 line 
@@ -202,7 +210,7 @@ void InitGUIslice_gen()
   gslc_ElemSetCol(&m_gui,pElemRef,GSLC_COL_BLACK,GSLC_COL_BLACK,GSLC_COL_BLACK);
   gslc_ElemSetFrameEn(&m_gui,pElemRef,true);
   gslc_ElemSetClickEn(&m_gui, pElemRef, true);
-  gslc_ElemSetTouchFunc(&m_gui, pElemRef, &CbBtnCommon);
+  // gslc_ElemSetTouchFunc(&m_gui, pElemRef, &CbBtnCommon);
   m_pElemVal2_3 = pElemRef;
 
   // -----------------------------------
@@ -213,22 +221,35 @@ void InitGUIslice_gen()
   pElemRef = gslc_ElemCreateImg(&m_gui,E_ELEM_IMAGE4,E_PG_WIFI_CONNECT,(gslc_tsRect){31,40,62,63},
     gslc_GetImageFromFile(IMG_G999,GSLC_IMGREF_FMT_JPG));
   
-  // Create E_ELEM_TEXT2 text label
-  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT2,E_PG_WIFI_CONNECT,(gslc_tsRect){40,10,39,15},
-    (char*)"WIFI",0,E_FREESANSBOLD9);
-  gslc_ElemSetTxtAlign(&m_gui,pElemRef,GSLC_ALIGN_MID_MID);
-  gslc_ElemSetTxtCol(&m_gui,pElemRef,GSLC_COL_WHITE);
+  // Create E_ELEM_TEXTINPUT1 text input field
+  static char m_sInputText1[11] = "WIFI";
+  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXTINPUT1,E_PG_WIFI_CONNECT,(gslc_tsRect){20,20,65,10},
+    (char*)m_sInputText1,11,E_BUILTIN5X8);
+  gslc_ElemSetTxtMargin(&m_gui,pElemRef,5);
+  gslc_ElemSetFrameEn(&m_gui,pElemRef,true);
+  gslc_ElemSetClickEn(&m_gui, pElemRef, true);
+  // gslc_ElemSetTouchFunc(&m_gui, pElemRef, &CbBtnCommon);
+  m_pElemInTxt1 = pElemRef;
 
   // -----------------------------------
   // PAGE: E_POP_KEYPAD_NUM
   
-  static gslc_tsXKeyPadCfg_Num sCfg;
-  sCfg = gslc_ElemXKeyPadCfgInit_Num();
-  gslc_ElemXKeyPadCfgSetFloatEn_Num(&sCfg, true);
-  gslc_ElemXKeyPadCfgSetSignEn_Num(&sCfg, true);
-  m_pElemKeyPadNum = gslc_ElemXKeyPadCreate_Num(&m_gui, E_ELEM_KEYPAD_NUM, E_POP_KEYPAD_NUM,
-    &m_sKeyPadNum, 65, 80, E_BUILTIN5X8, &sCfg);
-  gslc_ElemXKeyPadValSetCb(&m_gui, m_pElemKeyPadNum, &CbKeypad);
+  // static gslc_tsXKeyPadCfg_Num sCfg;
+  // sCfg = gslc_ElemXKeyPadCfgInit_Num();
+  // gslc_ElemXKeyPadCfgSetFloatEn_Num(&sCfg, true);
+  // gslc_ElemXKeyPadCfgSetSignEn_Num(&sCfg, true);
+  // m_pElemKeyPadNum = gslc_ElemXKeyPadCreate_Num(&m_gui, E_ELEM_KEYPAD_NUM, E_POP_KEYPAD_NUM,
+  //   &m_sKeyPadNum, 65, 80, E_BUILTIN5X8, &sCfg);
+  // gslc_ElemXKeyPadValSetCb(&m_gui, m_pElemKeyPadNum, &CbKeypad);
+
+  // -----------------------------------
+  // PAGE: E_POP_KEYPAD_ALPHA
+  
+  // static gslc_tsXKeyPadCfg_Alpha sCfgTx;
+  // sCfgTx = gslc_ElemXKeyPadCfgInit_Alpha();
+  // m_pElemKeyPadAlpha = gslc_ElemXKeyPadCreate_Alpha(&m_gui, E_ELEM_KEYPAD_ALPHA, E_POP_KEYPAD_ALPHA,
+  //   &m_sKeyPadAlpha, 65, 80, E_BUILTIN5X8, &sCfgTx);
+  // gslc_ElemXKeyPadValSetCb(&m_gui, m_pElemKeyPadAlpha, &CbKeypad);
 //<InitGUI !End!>
 
 //<Startup !Start!>

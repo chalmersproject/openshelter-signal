@@ -153,8 +153,8 @@ reqJson = {
 #define REQBUFF_SIZE 256
 #define VARBUFF_SIZE 256
 #define RESPBUFF_SIZE 2048
-const char *_API_HOST = "http://192.168.133.61:8080/graphql";
-// const char *_API_HOST = "https://api.cloud.chalmersproject.com/graphql";
+// const char *_API_HOST = "http://192.168.133.61:8080/graphql";
+const char *_API_HOST = "https://api.cloud.chalmersproject.com/graphql";
 // const char *_API_HOST = "https://1d2b-2607-f2c0-928a-b500-64cc-e3d2-f2ad-16c7.ngrok.io/graphql";
 // Attempting to do a multi-line variable declaration: HOWTO?
 const char *PUSH = "               \

@@ -214,8 +214,8 @@ void InitGUIslice_gen()
     gslc_GetImageFromFile(IMG_G999,GSLC_IMGREF_FMT_JPG));
   
   // Create E_ELEM_TEXT2 text label
-  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT2,E_PG_WIFI_CONNECT,(gslc_tsRect){40,10,39,15},
-    (char*)"WIFI",0,E_FREESANSBOLD9);
+  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT2,E_PG_WIFI_CONNECT,(gslc_tsRect){40,10,50,15},
+    (char*)"BEDS",0,E_FREESANSBOLD9);
   gslc_ElemSetTxtAlign(&m_gui,pElemRef,GSLC_ALIGN_MID_MID);
   gslc_ElemSetTxtCol(&m_gui,pElemRef,GSLC_COL_WHITE);
 
