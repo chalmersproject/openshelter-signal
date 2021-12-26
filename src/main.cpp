@@ -102,7 +102,7 @@ void initWifi()
   // WiFi.begin(_WIFI_SSID, _WIFI_PWD);
 
   // https://github.com/tzapu/WiFiManager/blob/master/examples/Basic/Basic.ino
-  // WiFiManager, Local intialization. Once its business is done, there is no need to keep it around  
+  // WiFiManager, Local intialization. Once its business is done, there is no need to keep it around
   WiFiManager wm;
 
   bool res;
@@ -125,7 +125,6 @@ void initWifi()
   // }
   // Serial.printf("SSID: %s\nIP: %s\n", _WIFI_SSID, WiFi.localIP().toString().c_str());
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    QUERY                                                              //
@@ -209,11 +208,11 @@ void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pu
   varJson["measurement"] = occupancy;
 
   Serial.println("Sending HTTP POST");
-  http.begin(client, _API_HOST); 
+  http.begin(client, _API_HOST);
   http.addHeader("Content-Type", "application/json");
 
   varJson["signalId"] = SIGNAL_ID;
-  reqJson["query"] = (push_or_pull == "push") ? PUSH : PULL ;
+  reqJson["query"] = (push_or_pull == "push") ? PUSH : PULL;
   reqJson["operationName"] = "CreateSignalMeasurement";
   reqJson["variables"] = varJson;
 
@@ -228,9 +227,9 @@ void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pu
   Serial.print("RESPONSE: ");
   Serial.println(http.getString());
 
-  if ( push_or_pull == "pull" )
+  if (push_or_pull == "pull")
   {
-    deserializeJson( resJson, http.getStream() );
+    deserializeJson(resJson, http.getStream());
     Serial.print(" Response Int: ");
     Serial.println(resJson["data"]["signal"]["value"].as<int>());
   }
@@ -240,7 +239,6 @@ void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pu
   // Serial.print("Response: ");
   // Serial.println( resJson.getElement );
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    Rotary Encoder Interrupt                                           //
@@ -268,8 +266,16 @@ void setup()
   // chalmers START screen
   //
 
-  if ( enable_internet == true)
+  if (enable_internet == true)
   {
+    gslc_InitDebug(&DebugOut);
+
+    // ------------------------------------------------
+    // Create graphic elements
+    // ------------------------------------------------
+    InitGUIslice_gen();
+    gslc_SetPageCur(&m_gui, E_PG_WIFI_CONNECT);
+    gslc_Update(&m_gui);
     initWifi();
     // HTTPClient http;
     client.setInsecure();
@@ -286,16 +292,15 @@ void setup()
 
       occupancy_request(client, occupancy, "pull");
     }
-    
+
     // TODO:
     // verify connection to api.chalmersproject.com
     //
-
   }
-  
-  // 
+
+  //
   // setup display with occupancy / capacity
-  // 
+  //
   // tft.clearScreen(BLACK);
   // tft.setRotation(2);
   // tft.setCursor(35, y1);
@@ -317,12 +322,6 @@ void setup()
   CHSV color = CHSV(hue, 255, 255);
   fill_solid(leds, NUM_LEDS, color);
   FastLED.show();
-  gslc_InitDebug(&DebugOut);
-
-  // ------------------------------------------------
-  // Create graphic elements
-  // ------------------------------------------------
-  InitGUIslice_gen();
 }
 
 unsigned long now, last;
@@ -352,7 +351,7 @@ void loop()
 
     //set barriers on occupancy
     if (0 >= occupancy)
-    { 
+    {
       occupancy = 0;
     }
     else if (occupancy >= capacity)
@@ -413,4 +412,3 @@ void loop()
     }
   }
 }
- 
