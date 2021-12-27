@@ -48,12 +48,10 @@
 // Enumerations for pages, elements, fonts, images
 // ------------------------------------------------
 //<Enum !Start!>
-enum {E_PG_MAIN,E_PG_WIFICON,E_PG_CLOUDSYNC,E_POP_KEYPAD_NUM};
-enum {CAPACITY_NUM_MONITOR,E_DRAW_LINE1,E_DRAW_LINE2,E_ELEM_BOX1
-      ,E_ELEM_NUMINPUT3,E_ELEM_TEXT1,E_ELEM_TEXT10,E_ELEM_TEXT11
-      ,E_ELEM_TEXT12,E_ELEM_TEXT4,E_ELEM_TEXT5,E_ELEM_TEXT6
-      ,E_ELEM_TEXT7,E_ELEM_TEXT8,E_ELEM_TEXT9,OCCUPANCY_GAGE
-      ,E_ELEM_KEYPAD_NUM};
+enum {E_PG_MAIN,E_PG_WIFICON,E_POP_KEYPAD_NUM};
+enum {CAPACITY_NUM_MONITOR,E_DRAW_LINE1,E_DRAW_LINE2,E_ELEM_NUMINPUT3
+      ,E_ELEM_TEXT1,E_ELEM_TEXT4,E_ELEM_TEXT5,E_ELEM_TEXT6,E_ELEM_TEXT7
+      ,E_ELEM_TEXT8,E_ELEM_TEXT9,OCCUPANCY_GAGE,E_ELEM_KEYPAD_NUM};
 // Must use separate enum for fonts with MAX_FONT at end to use gslc_FontSet.
 enum {E_BUILTIN5X8,E_FREESANS18,E_FREESANS9,E_FREESANSBOLD9,MAX_FONT};
 //<Enum !End!>
@@ -66,16 +64,13 @@ enum {E_BUILTIN5X8,E_FREESANS18,E_FREESANS9,E_FREESANSBOLD9,MAX_FONT};
 // Define the maximum number of elements and pages
 // ------------------------------------------------
 //<ElementDefines !Start!>
-#define MAX_PAGE                4
+#define MAX_PAGE                3
 
 #define MAX_ELEM_PG_MAIN 5 // # Elems total on page
 #define MAX_ELEM_PG_MAIN_RAM MAX_ELEM_PG_MAIN // # Elems in RAM
 
 #define MAX_ELEM_PG_WIFICON 7 // # Elems total on page
 #define MAX_ELEM_PG_WIFICON_RAM MAX_ELEM_PG_WIFICON // # Elems in RAM
-
-#define MAX_ELEM_PG_CLOUDSYNC 4 // # Elems total on page
-#define MAX_ELEM_PG_CLOUDSYNC_RAM MAX_ELEM_PG_CLOUDSYNC // # Elems in RAM
 //<ElementDefines !End!>
 
 // ------------------------------------------------
@@ -91,8 +86,6 @@ gslc_tsElem                     m_asPage1Elem[MAX_ELEM_PG_MAIN_RAM];
 gslc_tsElemRef                  m_asPage1ElemRef[MAX_ELEM_PG_MAIN];
 gslc_tsElem                     m_asPopup1Elem[MAX_ELEM_PG_WIFICON_RAM];
 gslc_tsElemRef                  m_asPopup1ElemRef[MAX_ELEM_PG_WIFICON];
-gslc_tsElem                     m_asPopup2Elem[MAX_ELEM_PG_CLOUDSYNC_RAM];
-gslc_tsElemRef                  m_asPopup2ElemRef[MAX_ELEM_PG_CLOUDSYNC];
 gslc_tsElem                     m_asKeypadNumElem[1];
 gslc_tsElemRef                  m_asKeypadNumElemRef[1];
 gslc_tsXKeyPad                  m_sKeyPadNum;
@@ -154,7 +147,6 @@ void InitGUIslice_gen()
 //<InitGUI !Start!>
   gslc_PageAdd(&m_gui,E_PG_MAIN,m_asPage1Elem,MAX_ELEM_PG_MAIN_RAM,m_asPage1ElemRef,MAX_ELEM_PG_MAIN);
   gslc_PageAdd(&m_gui,E_PG_WIFICON,m_asPopup1Elem,MAX_ELEM_PG_WIFICON_RAM,m_asPopup1ElemRef,MAX_ELEM_PG_WIFICON);
-  gslc_PageAdd(&m_gui,E_PG_CLOUDSYNC,m_asPopup2Elem,MAX_ELEM_PG_CLOUDSYNC_RAM,m_asPopup2ElemRef,MAX_ELEM_PG_CLOUDSYNC);
   gslc_PageAdd(&m_gui,E_POP_KEYPAD_NUM,m_asKeypadNumElem,1,m_asKeypadNumElemRef,1);  // KeyPad
 
   // NOTE: The current page defaults to the first page added. Here we explicitly
@@ -223,7 +215,6 @@ void InitGUIslice_gen()
   // Create E_ELEM_TEXT4 text label
   pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT4,E_PG_WIFICON,(gslc_tsRect){10,10,109,10},
     (char*)"Connecting to WiFi",0,E_BUILTIN5X8);
-  gslc_ElemSetTxtCol(&m_gui,pElemRef,GSLC_COL_WHITE);
   
   // Create E_ELEM_TEXT9 text label
   pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT9,E_PG_WIFICON,(gslc_tsRect){10,25,103,10},
@@ -234,48 +225,20 @@ void InitGUIslice_gen()
   gslc_ElemSetCol(&m_gui,pElemRef,GSLC_COL_BLACK,GSLC_COL_GRAY_LT2,GSLC_COL_GRAY_LT2);
   
   // Create E_ELEM_TEXT5 text label
-  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT5,E_PG_WIFICON,(gslc_tsRect){14,60,91,10},
-    (char*)"else connect to",0,E_BUILTIN5X8);
-  
-  // Create E_ELEM_TEXT8 text label
-  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT8,E_PG_WIFICON,(gslc_tsRect){22,75,73,10},
-    (char*)"WiFi network",0,E_BUILTIN5X8);
+  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT5,E_PG_WIFICON,(gslc_tsRect){0,40,109,10},
+    (char*)"connect to special",0,E_BUILTIN5X8);
   
   // Create E_ELEM_TEXT6 text label
-  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT6,E_PG_WIFICON,(gslc_tsRect){15,93,91,10},
-    (char*)"Chalmers-Signal",0,E_BUILTIN5X8);
-  gslc_ElemSetTxtCol(&m_gui,pElemRef,GSLC_COL_GREEN);
+  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT6,E_PG_WIFICON,(gslc_tsRect){20,80,79,10},
+    (char*)"On Your Phone",0,E_BUILTIN5X8);
   
   // Create E_ELEM_TEXT7 text label
-  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT7,E_PG_WIFICON,(gslc_tsRect){20,110,79,10},
-    (char*)"on your phone",0,E_BUILTIN5X8);
-
-  // -----------------------------------
-  // PAGE: E_PG_CLOUDSYNC
+  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT7,E_PG_WIFICON,(gslc_tsRect){25,100,67,10},
+    (char*)"To Continue",0,E_BUILTIN5X8);
   
-   
-  // Create E_ELEM_BOX1 box
-  pElemRef = gslc_ElemCreateBox(&m_gui,E_ELEM_BOX1,E_PG_CLOUDSYNC,(gslc_tsRect){5,40,115,48});
-  gslc_ElemSetRoundEn(&m_gui, pElemRef, true);
-  gslc_ElemSetCol(&m_gui,pElemRef,GSLC_COL_GRAY_DK2,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY_LT3);
-  
-  // Create E_ELEM_TEXT10 text label
-  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT10,E_PG_CLOUDSYNC,(gslc_tsRect){26,50,73,10},
-    (char*)"SYNCING WITH",0,E_BUILTIN5X8);
-  gslc_ElemSetTxtCol(&m_gui,pElemRef,GSLC_COL_BLACK);
-  gslc_ElemSetCol(&m_gui,pElemRef,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY_LT3);
-  
-  // Create E_ELEM_TEXT11 text label
-  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT11,E_PG_CLOUDSYNC,(gslc_tsRect){5,60,115,10},
-    (char*)"CHALMERSPROJECT.COM",0,E_BUILTIN5X8);
-  gslc_ElemSetTxtCol(&m_gui,pElemRef,GSLC_COL_BLACK);
-  gslc_ElemSetCol(&m_gui,pElemRef,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY_LT3);
-  
-  // Create E_ELEM_TEXT12 text label
-  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT12,E_PG_CLOUDSYNC,(gslc_tsRect){17,72,91,10},
-    (char*)"**PLEASE WAIT**",0,E_BUILTIN5X8);
-  gslc_ElemSetTxtCol(&m_gui,pElemRef,GSLC_COL_BLACK);
-  gslc_ElemSetCol(&m_gui,pElemRef,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY_LT3);
+  // Create E_ELEM_TEXT8 text label
+  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT8,E_PG_WIFICON,(gslc_tsRect){22,60,73,10},
+    (char*)"WiFi Network",0,E_BUILTIN5X8);
 
   // -----------------------------------
   // PAGE: E_POP_KEYPAD_NUM

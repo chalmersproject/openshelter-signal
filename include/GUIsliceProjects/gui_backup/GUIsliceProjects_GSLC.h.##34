@@ -223,7 +223,6 @@ void InitGUIslice_gen()
   // Create E_ELEM_TEXT4 text label
   pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT4,E_PG_WIFICON,(gslc_tsRect){10,10,109,10},
     (char*)"Connecting to WiFi",0,E_BUILTIN5X8);
-  gslc_ElemSetTxtCol(&m_gui,pElemRef,GSLC_COL_WHITE);
   
   // Create E_ELEM_TEXT9 text label
   pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT9,E_PG_WIFICON,(gslc_tsRect){10,25,103,10},
@@ -255,7 +254,7 @@ void InitGUIslice_gen()
   
    
   // Create E_ELEM_BOX1 box
-  pElemRef = gslc_ElemCreateBox(&m_gui,E_ELEM_BOX1,E_PG_CLOUDSYNC,(gslc_tsRect){5,40,115,48});
+  pElemRef = gslc_ElemCreateBox(&m_gui,E_ELEM_BOX1,E_PG_CLOUDSYNC,(gslc_tsRect){5,40,115,45});
   gslc_ElemSetRoundEn(&m_gui, pElemRef, true);
   gslc_ElemSetCol(&m_gui,pElemRef,GSLC_COL_GRAY_DK2,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY_LT3);
   

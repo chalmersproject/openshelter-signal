@@ -274,7 +274,7 @@ void setup()
     // Create graphic elements
     // ------------------------------------------------
     InitGUIslice_gen();
-    gslc_SetPageCur(&m_gui, E_PG_WIFI_CONNECT);
+    gslc_SetPageCur(&m_gui, E_PG_WIFICON);
     gslc_Update(&m_gui);
     initWifi();
     // HTTPClient http;
@@ -408,9 +408,13 @@ void loop()
   {
     if (enable_internet == true)
     {
+      gslc_SetPageCur(&m_gui, E_PG_CLOUDSYNC);
+      gslc_Update(&m_gui);
       Serial.println("pushing to " + (String)_API_HOST + "!");
       occupancy_request(client, occupancy, "push");
       change_to_push = false;
+      gslc_SetPageCur(&m_gui, E_PG_MAIN);
+      gslc_Update(&m_gui);
     }
   }
 }

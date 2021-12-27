@@ -1,4 +1,3 @@
-// Common Button callback
 bool CbBtnCommon(void *pvGui, void *pvElemRef, gslc_teTouch eTouch, int16_t nX, int16_t nY)
 {
     // Typecast the parameters to match the GUI and element types
@@ -15,6 +14,10 @@ bool CbBtnCommon(void *pvGui, void *pvElemRef, gslc_teTouch eTouch, int16_t nX, 
         case CAPACITY_NUM_MONITOR:
             // Clicked on edit field, so show popup box and associate with this text field
             gslc_ElemXKeyPadInputAsk(&m_gui, m_pElemKeyPadNum, E_POP_KEYPAD_NUM, m_pElemVal2);
+            break;
+        case E_ELEM_NUMINPUT3:
+            // Clicked on edit field, so show popup box and associate with this text field
+            gslc_ElemXKeyPadInputAsk(&m_gui, m_pElemKeyPadNum, E_POP_KEYPAD_NUM, m_pElemVal2_3);
             break;
             //<Button Enums !End!>
         default:
@@ -47,6 +50,10 @@ bool CbKeypad(void *pvGui, void *pvElemRef, int16_t nState, void *pvData)
             gslc_PopupHide(&m_gui);
             break;
 
+        case E_ELEM_NUMINPUT3:
+            gslc_ElemXKeyPadInputGet(pGui, m_pElemVal2_3, pvData);
+            gslc_PopupHide(&m_gui);
+            break;
             //<Keypad Enums !End!>
         default:
             break;
