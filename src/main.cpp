@@ -291,6 +291,8 @@ void setup()
       delay(4000);
 
       occupancy_request(client, occupancy, "pull");
+      gslc_SetPageCur(&m_gui, E_PG_MAIN);
+      gslc_Update(&m_gui);
     }
 
     // TODO:
