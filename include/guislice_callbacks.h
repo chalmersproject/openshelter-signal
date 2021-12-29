@@ -1,3 +1,8 @@
+
+// ------------------------------------------------
+// Callback Methods
+// ------------------------------------------------
+// Common Button callback
 bool CbBtnCommon(void *pvGui, void *pvElemRef, gslc_teTouch eTouch, int16_t nX, int16_t nY)
 {
     // Typecast the parameters to match the GUI and element types
