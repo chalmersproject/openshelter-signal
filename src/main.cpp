@@ -169,12 +169,32 @@ mutation CreateSignalMeasurement(  \
   }                                \
 }";
 
+// const char *PULL = "               \
+// query CheckSignalMeasurement(      \
+//   $signalId: ID!                   \
+// ) {                                \
+//     signal(id: $signalId)  {       \
+//       value                        \
+//     }                              \
+// }";
+
 const char *PULL = "               \
 query CheckSignalMeasurement(      \
   $signalId: ID!                   \
 ) {                                \
     signal(id: $signalId)  {       \
-      value                        \
+      measurements (limit:1){      \
+        occupancy                  \
+        {                          \
+          spots                    \
+          beds                     \
+        }                          \
+        capacity                   \
+        {                          \
+          spots                    \
+          beds                     \
+        }                          \
+      }                            \
     }                              \
 }";
 
@@ -187,7 +207,7 @@ query CheckSignalMeasurement(      \
 // } GraphqlQuery;
 
 // HTTP POST to chalmersproject API
-void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pull)
+void occupancy_request(WiFiClientSecure client, String push_or_pull)
 {
   // GraphqlQuery *graphql = (GraphqlQuery *)malloc(sizeof(GraphqlQuery));
   HTTPClient http;
@@ -222,9 +242,23 @@ void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pu
 
   if (push_or_pull == "pull")
   {
-    deserializeJson(resJson, http.getStream());
-    Serial.print(" Response Int: ");
-    Serial.println(resJson["data"]["signal"]["value"].as<int>());
+    // TODO: change http.getString to http.getStream --  https://arduinojson.org/v6/how-to/use-arduinojson-with-httpclient/
+    // according to arduino json docs using getString is inefficient as it copies the entire response into memory before copying it to the json variable
+    // but I can't get getStream() to work. DeserializeJson complains getStream() returns empty.
+    DeserializationError error = deserializeJson(resJson, http.getString());
+    // Test if parsing succeeds.
+    if (error)
+    {
+      Serial.print(F("deserializeJson() failed: "));
+      Serial.println(error.f_str());
+      // return;
+    }
+    occupancy = resJson["data"]["signal"]["measurements"][0]["occupancy"]["spots"].as<int>();
+    capacity = resJson["data"]["signal"]["measurements"][0]["capacity"]["spots"].as<int>();
+    // deserializeJson(resJson, http.getStream());
+    // Serial.println(" Response resJson: " + (String)resJson);
+    Serial.println(" Response occupancy: " + (String)occupancy);
+    Serial.println(" Response capacity: " + (String)capacity);
   }
 
   // Memory leaks begone :)
@@ -248,7 +282,28 @@ void ICACHE_RAM_ATTR encoder_change_trigger()
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    MAIN SCRIPT STARTS HERE                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////
+void update_all_GSlice_UI()
+{
+  char string_to_write[MAX_STR];
+  snprintf(string_to_write, MAX_STR, "%u", occupancy);
+  gslc_ElemSetTxtStr(&m_gui, m_pElemVal2, string_to_write);
 
+  snprintf(string_to_write, MAX_STR, "%u", capacity);
+  gslc_ElemSetTxtStr(&m_gui, m_pElemVal2_3, string_to_write);
+
+  int gauge_pos = map(occupancy, 0, capacity, 0, 100);
+  gslc_ElemXRingGaugeSetVal(&m_gui, m_pElemXRingGauge1, gauge_pos);
+  gslc_Update(&m_gui);
+}
+
+void update_LEDs()
+{
+  hue = map(occupancy, 0, capacity, 90, 0);
+  CHSV color = CHSV(hue, 255, 255);
+  fill_solid(leds, NUM_LEDS, color);
+  FastLED.show();
+  change_to_push = true;
+}
 void setup()
 {
   Serial.begin(115200);
@@ -276,15 +331,12 @@ void setup()
     {
       delay(4000);
 
-      occupancy_request(client, occupancy, "pull");
-
       // pull latest occupancy capacity numbers from remote and set them to the display
+      occupancy_request(client, "pull"); //
+      // Update OCCUPANCY and CAPACITY GUI numbers
       gslc_SetPageCur(&m_gui, E_PG_MAIN);
-      char string_to_write[MAX_STR];
-      snprintf(string_to_write, MAX_STR, "%u", occupancy);
-      gslc_ElemSetTxtStr(&m_gui, m_pElemVal2, string_to_write);
-      int gauge_pos = map(occupancy, 0, capacity, 0, 100);
-      gslc_Update(&m_gui);
+
+      update_all_GSlice_UI();
     }
 
     // TODO:
@@ -338,34 +390,11 @@ void loop()
     {
       occupancy = capacity;
     }
-    //
-    // Update OCCUPANCY and CAPACITY GUI numbers
-    //
-    char string_to_write[MAX_STR];
-
-    snprintf(string_to_write, MAX_STR, "%u", occupancy);
-    gslc_ElemSetTxtStr(&m_gui, m_pElemVal2, string_to_write);
-
-    // snprintf(string_to_write, MAX_STR, "%u", capacity);
-    // gslc_ElemSetTxtStr(&m_gui, m_pElemVal2_3, string_to_write);
-
-    //
-    // Update GUISlice gauge
-    //
-    int gauge_pos = map(occupancy, 0, capacity, 0, 100);
-    gslc_ElemXRingGaugeSetVal(&m_gui, m_pElemXRingGauge1, gauge_pos);
-
-    // ------------------------------------------------
-    // Periodically call GUIslice update function
-    // ------------------------------------------------
-    gslc_Update(&m_gui);
+    update_all_GSlice_UI();
 
     // update LEDs
-    hue = map(occupancy, 0, capacity, 90, 0);
-    CHSV color = CHSV(hue, 255, 255);
-    fill_solid(leds, NUM_LEDS, color);
-    FastLED.show();
-    change_to_push = true;
+    update_LEDs();
+
     last = now;
     last_occupancy = occupancy;
   }
@@ -381,8 +410,27 @@ void loop()
       gslc_SetPageCur(&m_gui, E_PG_CLOUDSYNC);
       gslc_Update(&m_gui);
       Serial.println("pushing to " + (String)_API_HOST + "!");
-      occupancy_request(client, occupancy, "push");
+      occupancy_request(client, "push");
       change_to_push = false;
+      last = now; // reset last counter so that pull sync happens at a minimum 30 seconds from now.
+      gslc_SetPageCur(&m_gui, E_PG_MAIN);
+      gslc_Update(&m_gui);
+    }
+  }
+  //
+  // wait at least 70 seconds since last change before pushing to api.chalmers.project
+  //
+  now = millis();
+  if (now - last >= 70000 && !(change_to_push))
+  {
+    if (enable_internet == true)
+    {
+      gslc_SetPageCur(&m_gui, E_PG_CLOUDSYNC);
+      gslc_Update(&m_gui);
+      Serial.println("pulling from " + (String)_API_HOST + "!");
+      occupancy_request(client, "pull");
+      change_to_push = false;
+      last = now; // reset last counter so that pull sync happens at a minimum 30 seconds from now.
       gslc_SetPageCur(&m_gui, E_PG_MAIN);
       gslc_Update(&m_gui);
     }
