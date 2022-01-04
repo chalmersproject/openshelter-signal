@@ -205,7 +205,8 @@ void occupancy_request(WiFiClientSecure client, int occupancy, String push_or_pu
 
   varJson["signalId"] = SIGNAL_ID;
   reqJson["query"] = (push_or_pull == "push") ? PUSH : PULL;
-  reqJson["operationName"] = "CreateSignalMeasurement";
+  Serial.println("reqJson: " + (String)reqJson["query"]);
+  reqJson["operationName"] = (push_or_pull == "push") ? "CreateSignalMeasurement" : "CheckSignalMeasurement";
   reqJson["variables"] = varJson;
 
   String request;
