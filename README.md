@@ -2,6 +2,8 @@
 
 This repository is for organization and work on the The Open-Shelter (pron. Chalmers Signal) Occupancy device firmware.
 
+We're drafting a technical project management requirements doc (thanks @shawarmashubs!!) for the Chalmers Project. Check it out (and add to it) here:  https://pad.snopyta.org/DfaRb0soT4iisrePidVl5g?view
+
 ## Quick Start
 Setting up a development environment for this firmware is easiest with Platform IO.
 
