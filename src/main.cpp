@@ -57,7 +57,7 @@ static bool enable_internet = true;
 static bool has_button = false;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-//                    Globals                                                            //
+//                    Globals                                                           \ //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -81,7 +81,7 @@ uint32 led_last;
 #define NUM_LEDS 8
 #define DATA_PIN 15
 CRGB leds[NUM_LEDS];
-int led_brightness = 64;
+int led_brightness = 32;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    FUNCTIONS                                                          //
@@ -394,7 +394,6 @@ void loop()
 
     // update LEDs
     update_LEDs();
-
     last = now;
     last_occupancy = occupancy;
   }
