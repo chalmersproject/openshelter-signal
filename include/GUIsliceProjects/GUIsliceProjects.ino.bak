@@ -1,6 +1,6 @@
 //<App !Start!>
 // FILE: [GUIsliceProjects.ino]
-// Created by GUIslice Builder version: [0.16.b008]
+// Created by GUIslice Builder version: [0.16.b009]
 //
 // GUIslice Builder Generated File
 //
@@ -23,6 +23,7 @@
 //<Save_References !Start!>
 gslc_tsElemRef* m_pElemVal2       = NULL;
 gslc_tsElemRef* m_pElemVal2_3     = NULL;
+gslc_tsElemRef* m_pElemVal2_5     = NULL;
 gslc_tsElemRef* m_pElemXRingGauge1= NULL;
 gslc_tsElemRef* m_pElemKeyPadNum  = NULL;
 //<Save_References !End!>
@@ -52,6 +53,10 @@ bool CbBtnCommon(void* pvGui,void *pvElemRef,gslc_teTouch eTouch,int16_t nX,int1
       case E_ELEM_NUMINPUT3:
         // Clicked on edit field, so show popup box and associate with this text field
         gslc_ElemXKeyPadInputAsk(&m_gui, m_pElemKeyPadNum, E_POP_KEYPAD_NUM, m_pElemVal2_3);
+        break;
+      case E_ELEM_NUMINPUT5:
+        // Clicked on edit field, so show popup box and associate with this text field
+        gslc_ElemXKeyPadInputAsk(&m_gui, m_pElemKeyPadNum, E_POP_KEYPAD_NUM, m_pElemVal2_5);
         break;
 //<Button Enums !End!>
       default:
@@ -84,6 +89,10 @@ bool CbKeypad(void* pvGui, void *pvElemRef, int16_t nState, void* pvData)
 
       case E_ELEM_NUMINPUT3:
         gslc_ElemXKeyPadInputGet(pGui, m_pElemVal2_3, pvData);
+	    gslc_PopupHide(&m_gui);
+        break;
+      case E_ELEM_NUMINPUT5:
+        gslc_ElemXKeyPadInputGet(pGui, m_pElemVal2_5, pvData);
 	    gslc_PopupHide(&m_gui);
         break;
 //<Keypad Enums !End!>
