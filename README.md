@@ -1,16 +1,10 @@
 # Chalmers Signal Occupancy
 
-This repository is for organization and work on the The Open-Shelter (pron. Chalmers Signal) Occupancy device firmware.
-
-We're drafting a technical project management requirements doc (thanks @shawarmashubs!!) for the Chalmers Project. Check it out (and add to it) here: https://pad.snopyta.org/DfaRb0soT4iisrePidVl5g?view
+This repository is for organization and work on the Chalmers Signal Occupancy device firmware.
 
 ## Quick Start
 
 Setting up a development environment for this firmware is easiest with Platform IO.
-
-## Hardware setup
-
-![SPI display hookup diagram](https://raw.githubusercontent.com/akasoggybunz/Wemos-Mini-D1-with-1.44-TFT-LCD-ST7735-Driver/master/diagram.PNG)
 
 ## Hardware Used in this project
 
