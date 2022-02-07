@@ -42,6 +42,9 @@ F/OSS under M.I.T License
 #include "guislice_init.h"
 #include "guislice_callbacks.h"
 
+// subroutines
+#include "subroutines/support_button_clicked.h"
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    Toggles                                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -368,7 +371,7 @@ void setup()
   FastLED.show();
 }
 
-unsigned long now, last, encoder_check_timer;
+unsigned long now, last, encoder_button_timer;
 
 void loop()
 {
@@ -428,7 +431,7 @@ void loop()
     }
   }
   //
-  // wait at least 70 seconds since last change before pushing to api.chalmers.project
+  // wait at least 70 seconds since last change before pushing to cloud.chalmersproject.com
   //
   now = millis();
   if (now - last >= 70000 && !(change_to_push))
@@ -445,18 +448,7 @@ void loop()
       gslc_Update(&m_gui);
     }
   }
-  //
-  // if not syncing wiht cloud.chalmersproject.com, every 1 second check output of rotary encoder button
-  //
+
   now = millis();
-  if (now - encoder_check_timer >= 1000)
-  {
-    Serial.println("Rotary Encoder Pin Value: " + (String)digitalRead(encoder_button_pin));
-    encoder_check_timer = now;
-  }
-  if (encoder_button_pressed == true)
-  {
-    Serial.println("encoder button pressed!");
-    encoder_button_pressed = false;
-  }
+  support_button_clicked(encoder_button_pin, now, encoder_button_timer);
 }
