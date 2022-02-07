@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////
 /*
 The Chalmers Signal Occuapncy Device is a client tally counter
-for shelter reception staff. 
+for shelter reception staff.
 
 Written and Maintained by the Chalmers project info@chalmersproject.com
 F/OSS under M.I.T License
@@ -14,7 +14,7 @@ F/OSS under M.I.T License
 ///////////////////////////////////////////////////////////////////////////////////////////
 #include <Arduino.h>
 
-//display
+// display
 #include <SPI.h>
 #include <RotaryEncoder.h>
 
@@ -36,7 +36,7 @@ F/OSS under M.I.T License
 //
 #include <shelter_secrets.h>
 
-//GUISlice
+// GUISlice
 
 #include "GUIsliceProjects/GUIsliceProjects_GSLC.h"
 #include "guislice_init.h"
@@ -54,10 +54,10 @@ static int display_color = 1; //(blue_pcb = 1; red_pcb = 2)
 static bool enable_internet = true;
 
 // earlier versions of chalmers signals don't have their button attached to the ESP. It's useful to be able to quickly turn off all features of the chalmers signal that use this button.
-static bool has_button = false;
+static bool has_button = true;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-//                    Globals                                                           \ //
+//                    Globals                                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -272,6 +272,7 @@ void occupancy_request(WiFiClientSecure client, String push_or_pull)
 ///////////////////////////////////////////////////////////////////////////////////////////
 // flag to mark when the dial has been moved. Calls the LEDs, LCD, and push_to_firebase functions
 bool change_to_push = false;
+bool encoder_button_pressed = false;
 
 void ICACHE_RAM_ATTR encoder_change_trigger()
 {
@@ -279,9 +280,16 @@ void ICACHE_RAM_ATTR encoder_change_trigger()
   Serial.println("interrupt triggered!");
 }
 
+void ICACHE_RAM_ATTR encoder_button_trigger()
+{
+  encoder_button_pressed = true;
+  Serial.println("encoder button was pressed!");
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    MAIN SCRIPT STARTS HERE                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////
+
 void update_all_GSlice_UI()
 {
   char string_to_write[MAX_STR];
@@ -304,19 +312,23 @@ void update_LEDs()
   FastLED.show();
   change_to_push = true;
 }
+
+#define encoder_button_pin 0
+
 void setup()
 {
+  pinMode(encoder_button_pin, INPUT_PULLUP);
   Serial.begin(115200);
   attachInterrupt(digitalPinToInterrupt(4), encoder_change_trigger, CHANGE);
   attachInterrupt(digitalPinToInterrupt(5), encoder_change_trigger, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(encoder_button_pin), encoder_button_trigger, ONLOW);
 
   // TODO
   // chalmers START screen
   //
-
+  gslc_InitDebug(&DebugOut);
   if (enable_internet == true)
   {
-    gslc_InitDebug(&DebugOut);
 
     // ------------------------------------------------
     // Create graphic elements
@@ -356,12 +368,11 @@ void setup()
   FastLED.show();
 }
 
-unsigned long now, last;
+unsigned long now, last, encoder_check_timer;
 
 void loop()
 {
   static int pos = 0;
-
   int newPos = encoder.getPosition();
   if (pos != newPos)
   {
@@ -381,7 +392,7 @@ void loop()
     Serial.println();
     pos = newPos;
 
-    //set barriers on occupancy
+    // set barriers on occupancy
     if (0 >= occupancy)
     {
       occupancy = 0;
@@ -433,5 +444,19 @@ void loop()
       gslc_SetPageCur(&m_gui, E_PG_MAIN);
       gslc_Update(&m_gui);
     }
+  }
+  //
+  // if not syncing wiht cloud.chalmersproject.com, every 1 second check output of rotary encoder button
+  //
+  now = millis();
+  if (now - encoder_check_timer >= 1000)
+  {
+    Serial.println("Rotary Encoder Pin Value: " + (String)digitalRead(encoder_button_pin));
+    encoder_check_timer = now;
+  }
+  if (encoder_button_pressed == true)
+  {
+    Serial.println("encoder button pressed!");
+    encoder_button_pressed = false;
   }
 }
