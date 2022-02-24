@@ -44,6 +44,7 @@ F/OSS under M.I.T License
 
 // subroutines
 #include "subroutines/support_button_clicked.h"
+#include "subroutines/sync_with_cloud.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    Toggles                                                            //
@@ -62,6 +63,12 @@ static bool has_button = true;
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    Globals                                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////
+
+//
+// Sync timer delays. These are the number of seconds the signal will wait
+// (since the dial was last changed) before pushing/pulling to/from
+// chalmers api
+#define pull_wait 70000 // 70 seconds
 
 //
 // Measured occupancy value from the chalmers signal
@@ -145,62 +152,6 @@ reqJson = {
 }
 */
 
-// #define SYNCPRINT_SIZE 256
-#define REQBUFF_SIZE 256
-#define VARBUFF_SIZE 256
-#define RESPBUFF_SIZE 2048
-// const char *_API_HOST = "http://192.168.133.61:8080/graphql";
-const char *_API_HOST = "https://api.cloud.chalmersproject.com/graphql";
-// const char *_API_HOST = "https://1d2b-2607-f2c0-928a-b500-64cc-e3d2-f2ad-16c7.ngrok.io/graphql";
-// Attempting to do a multi-line variable declaration: HOWTO?
-const char *PUSH = "               \
-mutation CreateSignalMeasurement(  \
-  $signalId: ID!                   \
-  $signalSecret: String!           \
-  $measurement: Int!               \
-) {                                \
-  createSignalMeasurement(         \
-    input: {                       \
-      signalId: $signalId          \
-      signalSecret: $signalSecret  \
-      measurement: $measurement    \
-    }                              \
-  ) {                              \
-    measurement {                  \
-      id                           \
-    }                              \
-  }                                \
-}";
-
-// const char *PULL = "               \
-// query CheckSignalMeasurement(      \
-//   $signalId: ID!                   \
-// ) {                                \
-//     signal(id: $signalId)  {       \
-//       value                        \
-//     }                              \
-// }";
-
-const char *PULL = "               \
-query CheckSignalMeasurement(      \
-  $signalId: ID!                   \
-) {                                \
-    signal(id: $signalId)  {       \
-      measurements (limit:1){      \
-        occupancy                  \
-        {                          \
-          spots                    \
-          beds                     \
-        }                          \
-        capacity                   \
-        {                          \
-          spots                    \
-          beds                     \
-        }                          \
-      }                            \
-    }                              \
-}";
-
 // typedef struct graphqlQuery
 // {
 //   char req[REQBUFF_SIZE];
@@ -208,67 +159,6 @@ query CheckSignalMeasurement(      \
 //   int status;
 //   String resp;
 // } GraphqlQuery;
-
-// HTTP POST to chalmersproject API
-void occupancy_request(WiFiClientSecure client, String push_or_pull)
-{
-  // GraphqlQuery *graphql = (GraphqlQuery *)malloc(sizeof(GraphqlQuery));
-  HTTPClient http;
-  DynamicJsonDocument reqJson(1024);
-  DynamicJsonDocument varJson(1024);
-  DynamicJsonDocument resJson(1024);
-
-  varJson["signalId"] = SIGNAL_ID;
-  varJson["signalSecret"] = SIGNAL_SECRET;
-  varJson["measurement"] = occupancy;
-
-  Serial.println("Sending HTTP POST");
-  http.begin(client, _API_HOST);
-  http.addHeader("Content-Type", "application/json");
-
-  varJson["signalId"] = SIGNAL_ID;
-  reqJson["query"] = (push_or_pull == "push") ? PUSH : PULL;
-  Serial.println("reqJson: " + (String)reqJson["query"]);
-  reqJson["operationName"] = (push_or_pull == "push") ? "CreateSignalMeasurement" : "CheckSignalMeasurement";
-  reqJson["variables"] = varJson;
-
-  String request;
-  serializeJson(reqJson, request);
-  Serial.print("REQUEST: ");
-  Serial.println(request);
-
-  int responseStatus = http.POST(request);
-  Serial.print("RESPONSE STATUS: ");
-  Serial.println(responseStatus);
-  Serial.print("RESPONSE: ");
-  Serial.println(http.getString());
-
-  if (push_or_pull == "pull")
-  {
-    // TODO: change http.getString to http.getStream --  https://arduinojson.org/v6/how-to/use-arduinojson-with-httpclient/
-    // according to arduino json docs using getString is inefficient as it copies the entire response into memory before copying it to the json variable
-    // but I can't get getStream() to work. DeserializeJson complains getStream() returns empty.
-    DeserializationError error = deserializeJson(resJson, http.getString());
-    // Test if parsing succeeds.
-    if (error)
-    {
-      Serial.print(F("deserializeJson() failed: "));
-      Serial.println(error.f_str());
-      // return;
-    }
-    occupancy = resJson["data"]["signal"]["measurements"][0]["occupancy"]["spots"].as<int>();
-    capacity = resJson["data"]["signal"]["measurements"][0]["capacity"]["spots"].as<int>();
-    // deserializeJson(resJson, http.getStream());
-    // Serial.println(" Response resJson: " + (String)resJson);
-    Serial.println(" Response occupancy: " + (String)occupancy);
-    Serial.println(" Response capacity: " + (String)capacity);
-  }
-
-  // Memory leaks begone :)
-  http.end();
-  // Serial.print("Response: ");
-  // Serial.println( resJson.getElement );
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    Rotary Encoder Interrupt                                           //
@@ -324,7 +214,7 @@ void setup()
   Serial.begin(115200);
   attachInterrupt(digitalPinToInterrupt(4), encoder_change_trigger, CHANGE);
   attachInterrupt(digitalPinToInterrupt(5), encoder_change_trigger, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(encoder_button_pin), encoder_button_trigger, ONLOW);
+  // attachInterrupt(digitalPinToInterrupt(encoder_button_pin), encoder_button_trigger, ONLOW);
 
   // TODO
   // chalmers START screen
@@ -347,7 +237,7 @@ void setup()
       delay(4000);
 
       // pull latest occupancy capacity numbers from remote and set them to the display
-      occupancy_request(client, "pull"); //
+      occupancy_request(client, "pull", occupancy, capacity); //
       // Update OCCUPANCY and CAPACITY GUI numbers
       gslc_SetPageCur(&m_gui, E_PG_MAIN);
 
@@ -423,7 +313,7 @@ void loop()
       gslc_SetPageCur(&m_gui, E_PG_CLOUDSYNC);
       gslc_Update(&m_gui);
       Serial.println("pushing to " + (String)_API_HOST + "!");
-      occupancy_request(client, "push");
+      occupancy_request(client, "push", occupancy, capacity);
       change_to_push = false;
       last = now; // reset last counter so that pull sync happens at a minimum 30 seconds from now.
       gslc_SetPageCur(&m_gui, E_PG_MAIN);
@@ -433,21 +323,9 @@ void loop()
   //
   // wait at least 70 seconds since last change before pushing to cloud.chalmersproject.com
   //
+
+  pull_from_cloud(now, last, client, pull_wait, enable_internet, change_to_push, occupancy, capacity);
   now = millis();
-  if (now - last >= 70000 && !(change_to_push))
-  {
-    if (enable_internet == true)
-    {
-      gslc_SetPageCur(&m_gui, E_PG_CLOUDSYNC);
-      gslc_Update(&m_gui);
-      Serial.println("pulling from " + (String)_API_HOST + "!");
-      occupancy_request(client, "pull");
-      change_to_push = false;
-      last = now; // reset last counter so that pull sync happens at a minimum 30 seconds from now.
-      gslc_SetPageCur(&m_gui, E_PG_MAIN);
-      gslc_Update(&m_gui);
-    }
-  }
 
   now = millis();
   support_button_clicked(encoder_button_pin, now, encoder_button_timer);
