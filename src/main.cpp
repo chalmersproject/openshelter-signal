@@ -29,7 +29,7 @@ F/OSS under M.I.T License
 //
 // JSON Support
 //
-#include <ArduinoJson.h>
+// #include <ArduinoJson.h>
 
 //
 // API secret and shelter ID
@@ -43,7 +43,7 @@ F/OSS under M.I.T License
 #include "guislice_callbacks.h"
 
 // subroutines
-#include "subroutines/support_button_clicked.h"
+// #include "subroutines/support_button_clicked.h"
 #include "subroutines/sync_with_cloud.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -64,12 +64,16 @@ static bool has_button = true;
 //                    Globals                                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+// flag to mark when the dial has been moved. Calls the LEDs, LCD, and push_to_firebase functions
+bool change_to_push = false;
+bool encoder_button_pressed = false;
+unsigned long now, last, encoder_button_timer;
 //
 // Sync timer delays. These are the number of seconds the signal will wait
 // (since the dial was last changed) before pushing/pulling to/from
 // chalmers api
 #define pull_wait 70000 // 70 seconds
-
+#define push_wait 3000  // 70 seconds
 //
 // Measured occupancy value from the chalmers signal
 //
@@ -129,43 +133,8 @@ void initWifi()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-//                    QUERY                                                              //
-///////////////////////////////////////////////////////////////////////////////////////////
-
-//
-// REQUEST FORMAT:
-//
-
-/*
-{
-  query: "...the raw query text...",
-  variables: {
-    signalId: "...",
-    signalSecret: "...",
-    _MEASUREMENT: 10
-  }
-}
-
-reqJson = {
-  query: "...",
-  variables: varJson
-}
-*/
-
-// typedef struct graphqlQuery
-// {
-//   char req[REQBUFF_SIZE];
-//   char var[VARBUFF_SIZE];
-//   int status;
-//   String resp;
-// } GraphqlQuery;
-
-///////////////////////////////////////////////////////////////////////////////////////////
 //                    Rotary Encoder Interrupt                                           //
 ///////////////////////////////////////////////////////////////////////////////////////////
-// flag to mark when the dial has been moved. Calls the LEDs, LCD, and push_to_firebase functions
-bool change_to_push = false;
-bool encoder_button_pressed = false;
 
 void ICACHE_RAM_ATTR encoder_change_trigger()
 {
@@ -237,7 +206,7 @@ void setup()
       delay(4000);
 
       // pull latest occupancy capacity numbers from remote and set them to the display
-      occupancy_request(client, "pull", occupancy, capacity); //
+      // occupancy_request(client, "pull", occupancy, capacity); //
       // Update OCCUPANCY and CAPACITY GUI numbers
       gslc_SetPageCur(&m_gui, E_PG_MAIN);
 
@@ -260,8 +229,6 @@ void setup()
   fill_solid(leds, NUM_LEDS, color);
   FastLED.show();
 }
-
-unsigned long now, last, encoder_button_timer;
 
 void loop()
 {
@@ -306,27 +273,7 @@ void loop()
   // wait at least 3 seconds since last change before pushing to api.chalmers.project
   //
   now = millis();
-  if (now - last >= 3000 && change_to_push)
-  {
-    if (enable_internet == true)
-    {
-      gslc_SetPageCur(&m_gui, E_PG_CLOUDSYNC);
-      gslc_Update(&m_gui);
-      Serial.println("pushing to " + (String)_API_HOST + "!");
-      occupancy_request(client, "push", occupancy, capacity);
-      change_to_push = false;
-      last = now; // reset last counter so that pull sync happens at a minimum 30 seconds from now.
-      gslc_SetPageCur(&m_gui, E_PG_MAIN);
-      gslc_Update(&m_gui);
-    }
-  }
-  //
-  // wait at least 70 seconds since last change before pushing to cloud.chalmersproject.com
-  //
-
-  pull_from_cloud(now, last, client, pull_wait, enable_internet, change_to_push, occupancy, capacity);
-  now = millis();
-
-  now = millis();
-  support_button_clicked(encoder_button_pin, now, encoder_button_timer);
+  push_to_cloud(now, last, client, push_wait, enable_internet, occupancy, capacity);
+  pull_from_cloud(now, last, client, pull_wait, enable_internet, occupancy, capacity);
+  // support_button_clicked(encoder_button_pin, now, encoder_button_timer);
 }
