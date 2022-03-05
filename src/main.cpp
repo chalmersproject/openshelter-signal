@@ -30,7 +30,11 @@ F/OSS under M.I.T License
 // JSON Support
 //
 // #include <ArduinoJson.h>
-
+//
+// globals and attributes
+//
+#include <globals/globals.h>
+#include <globals/attributes.h>
 //
 // API secret and shelter ID
 //
@@ -64,10 +68,6 @@ static bool has_button = true;
 //                    Globals                                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-// flag to mark when the dial has been moved. Calls the LEDs, LCD, and push_to_firebase functions
-bool change_to_push = false;
-bool encoder_button_pressed = false;
-unsigned long now, last, encoder_button_timer;
 //
 // Sync timer delays. These are the number of seconds the signal will wait
 // (since the dial was last changed) before pushing/pulling to/from

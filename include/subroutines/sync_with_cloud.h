@@ -1,3 +1,5 @@
+#ifndef SYNC_WITH_CLOUD_H
+#define SYNC_WITH_CLOUD_H
 #include <Arduino.h>
 
 //
@@ -12,55 +14,21 @@
 #include <WiFiManager.h>
 
 //
-// API secret and shelter ID
+// globals and attributes
 //
-#include <shelter_secrets.h>
+#include <globals/globals.h> //this contains timers used in this script
+#include <globals/attributes.h>
+#include <globals/graphql_queries.h> // PUSH and PULL graphql queries that are sent to API
+#include <shelter_secrets.h>         // API secret and shelter ID
 
+//
+// memory allocation for json objects to store graphql api queries
+//
 #define REQBUFF_SIZE 256
 #define VARBUFF_SIZE 256
 #define RESPBUFF_SIZE 2048
 
 const char *_API_HOST = "https://api.cloud.chalmersproject.com/graphql";
-
-// Attempting to do a multi-line variable declaration: HOWTO?
-const char *PUSH = "               \
-mutation CreateSignalMeasurement(  \
-  $signalId: ID!                   \
-  $signalSecret: String!           \
-  $measurement: Int!               \
-) {                                \
-  createSignalMeasurement(         \
-    input: {                       \
-      signalId: $signalId          \
-      signalSecret: $signalSecret  \
-      measurement: $measurement    \
-    }                              \
-  ) {                              \
-    measurement {                  \
-      id                           \
-    }                              \
-  }                                \
-}";
-
-const char *PULL = "               \
-query CheckSignalMeasurement(      \
-  $signalId: ID!                   \
-) {                                \
-    signal(id: $signalId)  {       \
-      measurements (limit:1){      \
-        occupancy                  \
-        {                          \
-          spots                    \
-          beds                     \
-        }                          \
-        capacity                   \
-        {                          \
-          spots                    \
-          beds                     \
-        }                          \
-      }                            \
-    }                              \
-}";
 
 void occupancy_request(WiFiClientSecure client, String push_or_pull, int occupancy, int capacity)
 {
@@ -175,3 +143,4 @@ void pull_from_cloud(unsigned long now, unsigned long last, WiFiClientSecure cli
     }
   }
 }
+#endif
