@@ -1,15 +1,5 @@
 #include <Arduino.h>
 
-// GuiSlice Libraries
-// #include "GUIsliceProjects/GUIsliceProjects_GSLC.h"
-// #include "guislice_init.h"
-// #include "guislice_callbacks.h"
-
-// Globals from main.cpp
-// extern bool change_to_push;
-// extern unsigned long now, last, encoder_button_timer;
-// bool change_to_push;
-// unsigned long now, last, encoder_button_timer;
 //
 // JSON Support
 //
@@ -72,10 +62,14 @@ query CheckSignalMeasurement(      \
     }                              \
 }";
 
-// HTTP POST to chalmersproject API
 void occupancy_request(WiFiClientSecure client, String push_or_pull, int occupancy, int capacity)
 {
+  // ESP8266 HTTP library object instatiation.
+  // this object handles all http requests
   HTTPClient http;
+  //
+  // memory allocation for storing json objects
+  // to be sent to the chalmers signal api
   DynamicJsonDocument reqJson(1024);
   DynamicJsonDocument varJson(1024);
   DynamicJsonDocument resJson(1024);
@@ -91,20 +85,38 @@ void occupancy_request(WiFiClientSecure client, String push_or_pull, int occupan
   varJson["signalId"] = SIGNAL_ID;
   reqJson["query"] = (push_or_pull == "push") ? PUSH : PULL;
   Serial.println("reqJson: " + (String)reqJson["query"]);
+
+  //
+  // this is where the graphql query gets set
+  // to one of the string literals defined above
+  // named *PUSH and *PULL
+  //
   reqJson["operationName"] = (push_or_pull == "push") ? "CreateSignalMeasurement" : "CheckSignalMeasurement";
+  //
+  // varJson["variables"] contains:
+  // shelter id, shelter secret, occupancy, capacity
+  //
   reqJson["variables"] = varJson;
 
   String request;
   serializeJson(reqJson, request);
+
   // Serial.print("REQUEST: ");
   // Serial.println(request);
 
   int responseStatus = http.POST(request);
+
+  // TODO: scope these to debug output
   // Serial.print("RESPONSE STATUS: ");
   // Serial.println(responseStatus);
   // Serial.print("RESPONSE: ");
   // Serial.println(http.getString());
 
+  //
+  // if we're *pulling data from* chalmers signal api
+  // we need this next block of code
+  // it handles recieving the json message from the api
+  // and pulling the occupancy and capacity values out of it
   if (push_or_pull == "pull")
   {
     DeserializationError error = deserializeJson(resJson, http.getString());
@@ -123,6 +135,11 @@ void occupancy_request(WiFiClientSecure client, String push_or_pull, int occupan
   // Memory leaks begone :)
   http.end();
 }
+
+// push_to_cloud handles sending the signal's current
+// state to the api.
+// Because the ESP8266 is a single core device we need to
+// be careful how often
 bool push_to_cloud(unsigned long now, unsigned long last, WiFiClientSecure client, int push_wait, bool enable_internet, int occupancy, int capacity)
 {
   if (now - last >= push_wait && change_to_push)
@@ -140,6 +157,7 @@ bool push_to_cloud(unsigned long now, unsigned long last, WiFiClientSecure clien
     }
   }
 }
+
 void pull_from_cloud(unsigned long now, unsigned long last, WiFiClientSecure client, int pull_wait, bool enable_internet, int occupancy, int capacity)
 {
   if (now - last >= 70000 && !(change_to_push))
