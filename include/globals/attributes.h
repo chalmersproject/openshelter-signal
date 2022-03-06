@@ -1,6 +1,20 @@
 #ifndef ATTRIBUTES_H
 #define ATTRIBUTES_H
 
+///////////////////////////////////////////////////////////////////////////////////////////
+//                    Toggles                                                            //
+///////////////////////////////////////////////////////////////////////////////////////////
+
+// some chalmers signals have red-pcb 1.44" displays from creatron
+// others use the cheaper blue-pcb 1.44" displays from aliexpress
+static int display_color = 1; //(blue_pcb = 1; red_pcb = 2)
+
+// for debugging it's useful to turn off the chalmers signal's internet-y abilities. That way we can do things like make changes with it's interface without waiting for it to connect to the internet
+static bool enable_internet = false;
+
+// earlier versions of chalmers signals don't have their button attached to the ESP. It's useful to be able to quickly turn off all features of the chalmers signal that use this button.
+static bool has_button = true;
+
 //
 // Sync timer delays
 //

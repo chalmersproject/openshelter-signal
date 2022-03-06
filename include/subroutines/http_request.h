@@ -1,17 +1,6 @@
 #ifndef HTTP_REQUEST_H
 #define HTTP_REQUEST_H
-#include <Arduino.h>
-
-//
-// JSON Support
-//
-#include <ArduinoJson.h>
-
-// WiFi and HTTPS requests
-#include <ESP8266HTTPClient.h>
-#include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h> // create TLS connection
-#include <WiFiManager.h>
+#include <external_library_includes.h>
 
 //
 // globals and attributes

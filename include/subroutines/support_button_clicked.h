@@ -1,8 +1,3 @@
-#include <Arduino.h>
-#include "GUIsliceProjects/GUIsliceProjects_GSLC.h"
-#include "guislice_init.h"
-#include "guislice_callbacks.h"
-
 bool countdown_start;
 
 void support_button_clicked(int encoder_button, unsigned long now, unsigned long encoder_button_timer)

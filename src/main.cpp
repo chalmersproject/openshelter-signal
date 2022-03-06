@@ -9,128 +9,18 @@ Written and Maintained by the Chalmers project info@chalmersproject.com
 F/OSS under M.I.T License
 */
 
-///////////////////////////////////////////////////////////////////////////////////////////
-//                     Includes                                                          //
-///////////////////////////////////////////////////////////////////////////////////////////
-#include <Arduino.h>
-
-// display
-#include <SPI.h>
-#include <RotaryEncoder.h>
-
-// WiFi and HTTPS requests
-#include <ESP8266HTTPClient.h>
-#include <ESP8266WiFi.h>
-#include <WiFiClientSecure.h> // create TLS connection
-#include <WiFiManager.h>
-// LED
-#include <FastLED.h>
-
-//
-// JSON Support
-//
-// #include <ArduinoJson.h>
-//
+#include <external_library_includes.h>
 // globals and attributes
-//
-#include <globals/globals.h>
 #include <globals/attributes.h>
-//
+#include <globals/globals.h>
+
 // API secret and shelter ID
-//
 #include <shelter_secrets.h>
 
-// GUISlice
-
-#include "GUIsliceProjects/GUIsliceProjects_GSLC.h"
-#include "guislice_init.h"
-#include "guislice_callbacks.h"
-
 // subroutines
+#include "subroutines/connect_to_wifi.h"
+#include "subroutines/sync_to_cloud.h"
 // #include "subroutines/support_button_clicked.h"
-#include "subroutines/sync_with_cloud.h"
-
-///////////////////////////////////////////////////////////////////////////////////////////
-//                    Toggles                                                            //
-///////////////////////////////////////////////////////////////////////////////////////////
-
-// some chalmers signals have red-pcb 1.44" displays from creatron
-// others use the cheaper blue-pcb 1.44" displays from aliexpress
-static int display_color = 1; //(blue_pcb = 1; red_pcb = 2)
-
-// for debugging it's useful to turn off the chalmers signal's internet-y abilities. That way we can do things like make changes with it's interface without waiting for it to connect to the internet
-static bool enable_internet = true;
-
-// earlier versions of chalmers signals don't have their button attached to the ESP. It's useful to be able to quickly turn off all features of the chalmers signal that use this button.
-static bool has_button = true;
-
-///////////////////////////////////////////////////////////////////////////////////////////
-//                    Globals                                                            //
-///////////////////////////////////////////////////////////////////////////////////////////
-
-//
-// Sync timer delays. These are the number of seconds the signal will wait
-// (since the dial was last changed) before pushing/pulling to/from
-// chalmers api
-#define pull_wait 70000 // 70 seconds
-#define push_wait 3000  // 70 seconds
-//
-// Measured occupancy value from the chalmers signal
-//
-int occupancy = 15;
-int capacity = 90;
-int last_occupancy;
-//
-// Rotary Encoder Global Variables
-//
-#define inputCLK 4 // pin
-#define inputDT 5
-RotaryEncoder encoder(5, 4);
-
-//
-// LED Globals
-//
-int hue = 0;
-uint32 led_last;
-#define NUM_LEDS 8
-#define DATA_PIN 15
-CRGB leds[NUM_LEDS];
-int led_brightness = 32;
-
-///////////////////////////////////////////////////////////////////////////////////////////
-//                    FUNCTIONS                                                          //
-///////////////////////////////////////////////////////////////////////////////////////////
-
-WiFiClientSecure client;
-void initWifi()
-{
-  WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
-  // WiFi.begin(_WIFI_SSID, _WIFI_PWD);
-
-  // https://github.com/tzapu/WiFiManager/blob/master/examples/Basic/Basic.ino
-  // WiFiManager, Local intialization. Once its business is done, there is no need to keep it around
-  WiFiManager wm;
-
-  bool res;
-  res = wm.autoConnect("Chalmers-Signal");
-  if (!res)
-  {
-    Serial.println("Failed to connect");
-    // ESP.restart();
-  }
-  else
-  {
-    // if you get here you have connected to the WiFi
-    Serial.println("connected...yeey :)");
-  }
-  // Serial.println("Connecting..");
-  // while (WiFi.status() != WL_CONNECTED)
-  // {
-  //   delay(500);
-  //   Serial.println(".");
-  // }
-  // Serial.printf("SSID: %s\nIP: %s\n", _WIFI_SSID, WiFi.localIP().toString().c_str());
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    Rotary Encoder Interrupt                                           //
@@ -208,8 +98,9 @@ void setup()
       // pull latest occupancy capacity numbers from remote and set them to the display
       // occupancy_request(client, "pull", occupancy, capacity); //
       // Update OCCUPANCY and CAPACITY GUI numbers
+      Serial.println("SAYING WIFI CONNECTED");
       gslc_SetPageCur(&m_gui, E_PG_MAIN);
-
+      Serial.println("UPDATING GUISLICE UI");
       update_all_GSlice_UI();
     }
 
@@ -228,11 +119,13 @@ void setup()
   CHSV color = CHSV(hue, 255, 255);
   fill_solid(leds, NUM_LEDS, color);
   FastLED.show();
+  Serial.println("END OF SETUP");
 }
 
 void loop()
 {
   static int pos = 0;
+  Serial.println("CHECKING POSITION OF DIAL");
   int newPos = encoder.getPosition();
   if (pos != newPos)
   {
@@ -261,11 +154,11 @@ void loop()
     {
       occupancy = capacity;
     }
+    Serial.println("UPDATING GUISLICE UI");
     update_all_GSlice_UI();
-
-    // update LEDs
     update_LEDs();
-    last = now;
+    Serial.println("UPDATING TIMERS last_change_time and last_occupancy");
+    last_change_time = now;
     last_occupancy = occupancy;
   }
 
@@ -273,7 +166,8 @@ void loop()
   // wait at least 3 seconds since last change before pushing to api.chalmers.project
   //
   now = millis();
-  push_to_cloud(now, last, client, push_wait, enable_internet, occupancy, capacity);
-  pull_from_cloud(now, last, client, pull_wait, enable_internet, occupancy, capacity);
+  // push_to_cloud(now, last, client, push_wait, enable_internet, occupancy, capacity);
+  // push_to_cloud();
+  // pull_from_cloud(now, last_change_time, client, pull_wait, enable_internet, occupancy, capacity);
   // support_button_clicked(encoder_button_pin, now, encoder_button_timer);
 }
