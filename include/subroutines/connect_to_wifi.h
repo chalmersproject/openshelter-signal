@@ -2,6 +2,7 @@
 #define CONNECT_TO_WIFI_H
 
 #include <external_library_includes.h>
+#include <subroutines/update_guislice.h>
 // #include <WiFiClientSecure.h> // create TLS connection
 // #include <WiFiManager.h>
 
@@ -34,6 +35,31 @@ void initWifi()
     //   Serial.println(".");
     // }
     // Serial.printf("SSID: %s\nIP: %s\n", _WIFI_SSID, WiFi.localIP().toString().c_str());
+
+    // TODO: get TLS working between signal and api
+    client.setInsecure();
+}
+void connect_to_wifi()
+{
+    gslc_SetPageCur(&m_gui, E_PG_WIFICON);
+    gslc_Update(&m_gui);
+    initWifi();
+
+    if (WiFi.status() == WL_CONNECTED)
+    {
+        delay(4000);
+
+        // pull latest occupancy capacity numbers from remote and set them to the display
+        // occupancy_request(client, "pull", occupancy, capacity); //
+        // Update OCCUPANCY and CAPACITY GUI numbers
+        Serial.println("SAYING WIFI CONNECTED");
+        gslc_SetPageCur(&m_gui, E_PG_MAIN);
+        Serial.println("UPDATING GUISLICE UI");
+        update_all_GSlice_UI();
+    }
+
+    // TODO:
+    // verify connection to api.chalmersproject.com
 }
 
 #endif

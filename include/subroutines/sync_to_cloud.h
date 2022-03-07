@@ -8,8 +8,8 @@
 //
 #include <globals/globals.h> //this contains timers used in this script
 #include <globals/attributes.h>
-#include <shelter_secrets.h>         // API secret and shelter ID
 #include <globals/graphql_queries.h> // PUSH and PULL graphql queries that are sent to API
+#include <shelter_secrets.h>         // API secret and shelter ID
 #include <subroutines/connect_to_wifi.h>
 #include <subroutines/http_request.h>
 
@@ -59,6 +59,32 @@ void pull_from_cloud(unsigned long now, unsigned long last, WiFiClientSecure cli
       gslc_SetPageCur(&m_gui, E_PG_MAIN);
       gslc_Update(&m_gui);
     }
+  }
+}
+
+bool sync_to_cloud(String push_or_pull)
+{
+  // if it's been longer than push_wait since last_change_time, push current dial state "occupancy"
+  // to the api
+  if (now - last_change_time >= push_wait && change_to_push)
+  {
+    gslc_SetPageCur(&m_gui, E_PG_CLOUDSYNC);
+    gslc_Update(&m_gui);
+    // doing the actual push to the database can be disabled in attributes by setting
+    // enable_internet to false
+    if (enable_internet == true)
+    {
+      // Serial.println("pushing to " + (String)_API_HOST + "!");
+      occupancy_request(client, "push", occupancy, capacity);
+    }
+    else
+    {
+      delay(1500); // use a delay to simulate the time spent waiting for HTTP request to resolve
+    }
+    change_to_push = false;
+    last_change_time = now; // reset last counter so that pull sync happens at a minimum 30 seconds from now.
+    gslc_SetPageCur(&m_gui, E_PG_MAIN);
+    gslc_Update(&m_gui);
   }
 }
 #endif
