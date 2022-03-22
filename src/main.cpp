@@ -52,6 +52,8 @@ void setup()
     update_all_GSlice_UI();
   }
 
+  init_LEDs();
+
   Serial.println("END OF SETUP");
 }
 
@@ -88,6 +90,7 @@ void loop()
     Serial.println();
     Serial.println("UPDATING GUISLICE UI");
     update_all_GSlice_UI();
+    update_LEDs();
     // update_LEDs();
     Serial.println("UPDATING TIMERS last_change_time and last_occupancy");
     last_change_time = now;
