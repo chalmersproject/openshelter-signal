@@ -45,14 +45,11 @@ void setup()
   if (enable_internet == true)
   {
     connect_to_wifi();
+    sync_to_cloud("pull");
   }
-  else
-  {
-    gslc_SetPageCur(&m_gui, E_PG_MAIN);
-    update_all_GSlice_UI();
-  }
-
   init_LEDs();
+  gslc_SetPageCur(&m_gui, E_PG_MAIN);
+  update_all_GSlice_UI();
 
   Serial.println("END OF SETUP");
 }
@@ -85,22 +82,26 @@ void loop()
     {
       occupancy = capacity;
     }
+
     Serial.print("occupancy: ");
     Serial.print(occupancy);
     Serial.println();
     Serial.println("UPDATING GUISLICE UI");
     update_all_GSlice_UI();
     update_LEDs();
-    // update_LEDs();
+
     Serial.println("UPDATING TIMERS last_change_time and last_occupancy");
     last_change_time = now;
     last_occupancy = occupancy;
+    change_to_push = true;
   }
 
   //
   // wait at least 3 seconds since last change before pushing to api.chalmers.project
   //
   now = millis();
+  sync_to_cloud("push");
+  sync_to_cloud("pull");
   // push_to_cloud(now, last, client, push_wait, enable_internet, occupancy, capacity);
   // push_to_cloud();
   // pull_from_cloud(now, last_change_time, client, pull_wait, enable_internet, occupancy, capacity);

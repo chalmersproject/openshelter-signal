@@ -17,7 +17,7 @@ void init_interrupts()
 {
     attachInterrupt(digitalPinToInterrupt(4), encoder_change_trigger, CHANGE);
     attachInterrupt(digitalPinToInterrupt(5), encoder_change_trigger, CHANGE);
-    pinMode(encoder_button_pin, INPUT_PULLUP);
+    pinMode(button_pin, INPUT_PULLUP);
     // attachInterrupt(digitalPinToInterrupt(encoder_button_pin), encoder_button_trigger, ONLOW);
 }
 #endif

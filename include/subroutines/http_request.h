@@ -19,7 +19,7 @@
 
 const char *_API_HOST = "https://api.cloud.chalmersproject.com/graphql";
 
-void occupancy_request(WiFiClientSecure client, String push_or_pull, int occupancy, int capacity)
+void occupancy_request(String push_or_pull)
 {
     // ESP8266 HTTP library object instatiation.
     // this object handles all http requests

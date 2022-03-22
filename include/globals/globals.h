@@ -21,17 +21,22 @@ bool encoder_button_pressed = false;
 unsigned long now;
 //
 // timer that records how long since last time dial was changed
-unsigned long last_change_time;
+// last_change_time is reset to value of now/millis() whenever:
+// - the dial gets moved
+// - a push to the API is made
+// - a pull from the API is made
+// gets initialized at the value of pull_wait attribute. That's so when sync_to_cloud("pull") gets called in setup the last change timer will have a high enough time that the pull happens.
+unsigned long last_change_time = pull_wait;
 //
 // timer that records how long since the encoder's click-y button was pressed
-unsigned long encoder_button_time;
+unsigned long button_clicked_time;
 
 //
 // Rotary Encoder Global Variables
 //
 
 // rotary encoder clicky button
-#define encoder_button_pin 0
+#define button_pin 0
 
 // pin 1 on rotary encoder
 #define inputCLK 4

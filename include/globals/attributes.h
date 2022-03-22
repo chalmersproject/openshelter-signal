@@ -10,7 +10,7 @@
 static int display_color = 1; //(blue_pcb = 1; red_pcb = 2)
 
 // for debugging it's useful to turn off the chalmers signal's internet-y abilities. That way we can do things like make changes with it's interface without waiting for it to connect to the internet
-static bool enable_internet = false;
+static bool enable_internet = true;
 
 // earlier versions of chalmers signals don't have their button attached to the ESP. It's useful to be able to quickly turn off all features of the chalmers signal that use this button.
 static bool has_button = true;
@@ -21,7 +21,7 @@ static bool has_button = true;
 
 // pull_from_cloud timer
 // how long to wait (after the last time the dial was turned)
+// int pull_wait = 70000; // 70 seconds
 int pull_wait = 70000; // 70 seconds
-int push_wait = 3000;  // 70 seconds
-
+int push_wait = 3000;  // 3 seconds
 #endif
