@@ -21,6 +21,7 @@ F/OSS under M.I.T License
 #include "subroutines/connect_to_wifi.h"
 #include "subroutines/sync_to_cloud.h"
 #include "subroutines/update_guislice.h"
+#include "subroutines/led_init_and_update.h"
 // #include "subroutines/support_button_clicked.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -30,15 +31,6 @@ F/OSS under M.I.T License
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    MAIN SCRIPT STARTS HERE                                            //
 ///////////////////////////////////////////////////////////////////////////////////////////
-
-void update_LEDs()
-{
-  hue = map(occupancy, 0, capacity, 90, 0);
-  CHSV color = CHSV(hue, 255, 255);
-  fill_solid(leds, NUM_LEDS, color);
-  FastLED.show();
-  change_to_push = true;
-}
 
 void setup()
 {
@@ -60,16 +52,6 @@ void setup()
     update_all_GSlice_UI();
   }
 
-  //
-  // start LED with color of occupancy / capacity
-  //
-  // FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
-  // FastLED.setBrightness(led_brightness);
-
-  // hue = map(occupancy, 0, capacity, 90, 0);
-  // CHSV color = CHSV(hue, 255, 255);
-  // fill_solid(leds, NUM_LEDS, color);
-  // FastLED.show();
   Serial.println("END OF SETUP");
 }
 

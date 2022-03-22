@@ -62,11 +62,12 @@ void pull_from_cloud(unsigned long now, unsigned long last, WiFiClientSecure cli
   }
 }
 
-bool sync_to_cloud(String push_or_pull)
+void sync_to_cloud(String sync_direction)
 {
-  // if it's been longer than push_wait since last_change_time, push current dial state "occupancy"
-  // to the api
-  if (now - last_change_time >= push_wait && change_to_push)
+  // if it's been longer than push_wait since last_change_time, sync signal state to the API
+
+  int sync_wait = (sync_direction == "push") ? push_wait : pull_wait;
+  if (now - last_change_time >= sync_wait && change_to_push)
   {
     gslc_SetPageCur(&m_gui, E_PG_CLOUDSYNC);
     gslc_Update(&m_gui);
@@ -75,16 +76,23 @@ bool sync_to_cloud(String push_or_pull)
     if (enable_internet == true)
     {
       // Serial.println("pushing to " + (String)_API_HOST + "!");
-      occupancy_request(client, "push", occupancy, capacity);
+      occupancy_request(client, sync_direction, occupancy, capacity);
     }
     else
     {
       delay(1500); // use a delay to simulate the time spent waiting for HTTP request to resolve
     }
     change_to_push = false;
-    last_change_time = now; // reset last counter so that pull sync happens at a minimum 30 seconds from now.
+    // reset last_change_time counter so the next cloud sync is at
+    // least sync_wait seconds away
+    last_change_time = now;
+
+    // finally return to main guislice page
     gslc_SetPageCur(&m_gui, E_PG_MAIN);
     gslc_Update(&m_gui);
+    // TODO: if cloud sync returns an error, throw an error message
+    // onto the screen before returning to main page
+    // maybe ask the user to send for support from chalmers project
   }
 }
 #endif
