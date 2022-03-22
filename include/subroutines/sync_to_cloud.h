@@ -61,11 +61,20 @@ void pull_from_cloud(unsigned long now, unsigned long last, WiFiClientSecure cli
     }
   }
 }
+/*
+Periodically the signal will push it's latest data to the api, or it will pull down the
+API's latest data (to ensure the data stored in the cloud is the source of truth)
+When a signal pushes or pulls it calls an HTTP library that takes up the microcontroller's
+single CPU thread. This means the signal will stop listening for changes on the dial. From the user's point of view the signal has "frozen".
 
+To keep this "freezing" to a minumum, we run timers
+Push and Pull have different "wait" lengths. Timers get reset any time the dial is moved
+or a sync_to_cloud happens.
+*/
 void sync_to_cloud(String sync_direction)
 {
-  // if it's been longer than push_wait since last_change_time, sync signal state to the API
-
+  // if it's been longer than sync_wait since last_change_time, sync signal state to the API
+  // these are set in include/globals/attributes.h
   int sync_wait = (sync_direction == "push") ? push_wait : pull_wait;
   if (now - last_change_time >= sync_wait && change_to_push)
   {
