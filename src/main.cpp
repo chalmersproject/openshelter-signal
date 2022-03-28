@@ -86,6 +86,7 @@ void loop()
     Serial.print("occupancy: ");
     Serial.print(occupancy);
     Serial.println();
+
     Serial.println("UPDATING GUISLICE UI");
     update_all_GSlice_UI();
     update_LEDs();
