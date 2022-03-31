@@ -22,7 +22,7 @@ F/OSS under M.I.T License
 #include "subroutines/sync_to_cloud.h"
 #include "subroutines/update_guislice.h"
 #include "subroutines/led_init_and_update.h"
-// #include "subroutines/support_button_clicked.h"
+#include "subroutines/support_button.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    Rotary Encoder Interrupt                                           //
@@ -103,6 +103,8 @@ void loop()
   now = millis();
   sync_to_cloud("push");
   sync_to_cloud("pull");
+  support_button_clicked();
+
   // push_to_cloud(now, last, client, push_wait, enable_internet, occupancy, capacity);
   // push_to_cloud();
   // pull_from_cloud(now, last_change_time, client, pull_wait, enable_internet, occupancy, capacity);

@@ -21,7 +21,9 @@ static bool has_button = true;
 
 // pull_from_cloud timer
 // how long to wait (after the last time the dial was turned)
-// int pull_wait = 70000; // 70 seconds
 int pull_wait = 70000; // 70 seconds
 int push_wait = 3000;  // 3 seconds
+int button_clicked_wait = 5000;
+int button_clicked_debounce = 5000;
+
 #endif

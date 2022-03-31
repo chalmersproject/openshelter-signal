@@ -27,10 +27,13 @@ unsigned long now;
 // - a pull from the API is made
 // gets initialized at the value of pull_wait attribute. That's so when sync_to_cloud("pull") gets called in setup the last change timer will have a high enough time that the pull happens.
 unsigned long last_change_time = pull_wait;
+
 //
 // timer that records how long since the encoder's click-y button was pressed
 unsigned long button_clicked_time;
-
+bool button_pushed;
+bool last_button_state;
+bool button_state;
 //
 // Rotary Encoder Global Variables
 //
@@ -44,8 +47,8 @@ unsigned long button_clicked_time;
 // pin 2 on rotary encoder
 #define inputDT 5
 
-// the RotaryEncoder Library object
-RotaryEncoder encoder(5, 4);
+    // the RotaryEncoder Library object
+    RotaryEncoder encoder(5, 4);
 
 // tracks absolute position of dial.
 // i.e. (all it's clockwise turns) - (all it's couterclockwise turns)
