@@ -6,33 +6,59 @@
 #include <globals/attributes.h>
 
 bool countdown_start;
+// flag to track if support message was just sent
+// used to reset back to "START SEND FOR HELP SCREEN" incase 
+// user holds down the button after countdown completes and
+// support message is sent
+bool telegram_message_sent = false;
 
 void support_button_clicked()
 {
     last_button_state = button_state;
     button_state = digitalRead(button_pin);
 
-    //
-    // if button is pressed, and was previously released
+    // button is HIGH when released
+    if (button_state == HIGH)
+    {
+        //while button released, keep button_clicked_time in sync with now
+        button_clicked_time = now;
+        telegram_message_sent = false;
+    }
+    //if button is pressed, allow button_clicked_time to start to drift from now
     if ((button_state == LOW) && (last_button_state == HIGH))
     {
-        // if button is getting clicked, start timing how long
-        button_clicked_time = now;
-        Serial.println("ENCODER BUTTON PRESSED!");
+        Serial.println("begin drifting button_clicked_time and now");
     }
+    // if button has been held down length button_clicked_debounce
+    // or if button is being held down and telegram message was *just sent*
+    // set screen to "CALLING FOR HELP COUNTDOWN" screen
+    if (
+        // TODO: these debounces & flags are getting unruly
+        // For now I'll just rely on that the guislice calls will naturally introduce a debounce
+        // but eventually I should move to some kind of scheduler/timer library.
+        // (button_state == LOW) && (( now - button_clicked_time ) >= button_clicked_debounce ) || 
+        (button_state == LOW) && (last_button_state == HIGH) || 
+        (button_state == LOW) && (last_button_state == LOW) && ( telegram_message_sent )
+        )
+    {
+        Serial.println("ENCODER BUTTON PRESSED");
+        Serial.println("START SEND FOR HELP SCREEN");
+        telegram_message_sent = false;
+    } //when button is released, return screen to standard display
     else if ((button_state == HIGH) && (last_button_state == LOW))
     {
-        button_clicked_time = 0;
         Serial.println("ENCODER BUTTON RELEASED!");
-    }
-    else if (button_state == last_button_state)
-    {
+        button_clicked_time = now;
     }
 
     if ((now - button_clicked_time) >= button_clicked_wait)
     {
         Serial.println("button held for 5 seconds! SEND MESSAGE!");
-        button_clicked_time = 0;
+        //TODO: switch screen to SENDING_FOR_SUPPORT screen
+        //TODO: send telegram message to support group.
+        telegram_message_sent = true;
+        //reset time to now, so if button is still held
+        button_clicked_time = now;
     }
     // if button has been held for button_clicked_wait milliseconds
     // send
