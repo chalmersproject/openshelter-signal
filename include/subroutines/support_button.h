@@ -26,7 +26,7 @@ void support_button_clicked()
     }
     //if button is pressed, allow button_clicked_time to start to drift from now
     if ((button_state == LOW) && (last_button_state == HIGH))
-    {
+    { 
         Serial.println("begin drifting button_clicked_time and now");
     }
     // if button has been held down length button_clicked_debounce
@@ -48,6 +48,8 @@ void support_button_clicked()
     else if ((button_state == HIGH) && (last_button_state == LOW))
     {
         Serial.println("ENCODER BUTTON RELEASED!");
+        gslc_SetPageCur(&m_gui, E_PG_MAIN);
+        gslc_Update(&m_gui);
         button_clicked_time = now;
     }
 
