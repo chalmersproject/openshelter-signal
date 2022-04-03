@@ -43,6 +43,8 @@ void support_button_clicked()
     {
         Serial.println("ENCODER BUTTON PRESSED");
         Serial.println("START SEND FOR HELP SCREEN");
+        gslc_SetPageCur(&m_gui, E_PG_SUPPORTCALL);
+        gslc_Update(&m_gui);
         telegram_message_sent = false;
     } //when button is released, return screen to standard display
     else if ((button_state == HIGH) && (last_button_state == LOW))
