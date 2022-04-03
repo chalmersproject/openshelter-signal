@@ -12,6 +12,8 @@ bool countdown_start;
 // support message is sent
 bool telegram_message_sent = false;
 
+// used to calculate how many seconds button has been held for
+int button_clicked_time_seconds, last_button_clicked_time_seconds, button_clicked_time_countdown;
 void support_button_clicked()
 {
     last_button_state = button_state;
@@ -29,6 +31,39 @@ void support_button_clicked()
     { 
         Serial.println("begin drifting button_clicked_time and now");
     }
+    // while button is held down, calculate how many seconds it has been held for
+    if (button_state == LOW)
+    {
+        // so long as button is pushed, keep last_change_time synced with now
+        // to prevent push or pull to cloud happening while support button is pushed
+        last_change_time = now;
+        // record the number of seconds since button was pressed
+        // num of seconds button has been clicked is equal to the difference in time
+        // between now and button_clicked_time
+        // then we convert button_clicked_time_seconds from millis to seconds, rounding up
+        // button_clicked_time_seconds = (int)round((now - button_clicked_time/1000));
+        button_clicked_time_seconds = (int)( (now - button_clicked_time) / 1000 );
+
+        // Serial.println("Button Clicked Seconds CURRENT: " + (String)button_clicked_time_seconds);
+        // Serial.println("last_button_seconds:          " + (String)last_button_clicked_time_seconds);
+        // Serial.println("button_clicked_time_seconds: " + (String)button_clicked_time_seconds);
+        // if num of seconds has changed since the last time we checked, 
+        // update guiSlice countdown button
+        if (button_clicked_time_seconds != last_button_clicked_time_seconds)
+        {
+            
+            Serial.println("Button Clicked Seconds: " + (String)button_clicked_time_seconds);
+            button_clicked_time_countdown = (int)(button_clicked_wait/1000) - button_clicked_time_seconds;
+            char string_to_write[MAX_STR];
+            snprintf(string_to_write, MAX_STR, "%u", button_clicked_time_countdown);
+            gslc_ElemSetTxtStr(&m_gui, m_pElemVal2_5, string_to_write);
+            gslc_Update(&m_gui);
+            // last_button_clicked_time_seconds = button_clicked_time_seconds;
+        }
+        // reset last_button_clicked_time_seconds to current button_clicked_time_seconds
+        // to prepare for the next time we check
+        last_button_clicked_time_seconds = button_clicked_time_seconds;
+    }
     // if button has been held down length button_clicked_debounce
     // or if button is being held down and telegram message was *just sent*
     // set screen to "CALLING FOR HELP COUNTDOWN" screen
@@ -43,6 +78,8 @@ void support_button_clicked()
     {
         Serial.println("ENCODER BUTTON PRESSED");
         Serial.println("START SEND FOR HELP SCREEN");
+        gslc_SetPageCur(&m_gui, E_PG_SUPPORTCALL);
+        gslc_Update(&m_gui);
         telegram_message_sent = false;
     } //when button is released, return screen to standard display
     else if ((button_state == HIGH) && (last_button_state == LOW))
