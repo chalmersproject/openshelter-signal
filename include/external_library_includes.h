@@ -12,6 +12,10 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h> // create TLS connection
 #include <WiFiManager.h>
+
+// For sending Telegram "NEED HELP" messages from a chalmers signal
+#include <UniversalTelegramBot.h>
+
 // JSON Support
 #include <ArduinoJson.h>
 

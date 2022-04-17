@@ -1,6 +1,9 @@
-#define WIFI_SSID "duh\ wiffy\ name"
-#define WIFI_PASSWORD "duh_passwerd"
-
-#define FIREBASE_HOST "chalmers-signal.firebaseio.com" // Do not include https://
-#define FIREBASE_AUTH "contact misterchalmers@protonmail.com for this!!! or use your own firebase live database"
-// the FIREBASE_AUTH token is kind of hidden in the firebase console. go to https://console.firebase.google.com/project/your-project-name/settings/serviceaccounts/databasesecrets. you'll find it there.
+// get from chalmersproject.com
+#define SIGNAL_ID "contact misterchalmers@protonmail.com for this!"
+#define SIGNAL_SECRET "contact misterchalmers@protonmail.com for this!"
+// Telegram BOT Token (Get from Botfather)
+#define BOT_TOKEN "contact misterchalmers@protonmail.com for this!"
+// Use @myidbot (IDBot) to find out the chat ID of an individual or a group
+// Also note that you need to click "start" on a bot before it can
+// message you
+#define CHAT_ID "contact misterchalmers@protonmail.com for this!"

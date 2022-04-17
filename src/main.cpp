@@ -22,6 +22,7 @@ F/OSS under M.I.T License
 #include "subroutines/sync_to_cloud.h"
 #include "subroutines/update_guislice.h"
 #include "subroutines/led_init_and_update.h"
+#include "subroutines/telegram_init_and_send.h"
 #include "subroutines/support_button.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
