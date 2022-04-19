@@ -4,6 +4,7 @@
 #include <external_library_includes.h>
 #include <globals/globals.h> //this contains timers used in this script
 #include <globals/attributes.h>
+#include <subroutines/telegram_init_and_send.h>
 
 bool countdown_start;
 // flag to track if support message was just sent
@@ -95,6 +96,7 @@ void support_button_clicked()
         Serial.println("button held for 5 seconds! SEND MESSAGE!");
         //TODO: switch screen to SENDING_FOR_SUPPORT screen
         //TODO: send telegram message to support group.
+        bot.sendMessage(CHAT_ID, "St Felix Augusta: NEED SUPPORT!", "");
         telegram_message_sent = true;
         //reset time to now, so if button is still held
         button_clicked_time = now;
