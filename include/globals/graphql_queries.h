@@ -26,6 +26,7 @@ query CheckSignalMeasurement(      \
   $signalId: ID!                   \
 ) {                                \
     signal(id: $signalId)  {       \
+      name                         \
       measurements (limit:1){      \
         occupancy                  \
         {                          \
