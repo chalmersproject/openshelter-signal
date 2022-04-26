@@ -12,6 +12,8 @@ int last_occupancy = 0;
 // sitting space or bed space.
 int capacity = 100;
 
+String shelter_name;
+String signal_class;
 // flag to mark when the dial has been moved
 bool change_to_push = false;
 bool encoder_button_pressed = false;
