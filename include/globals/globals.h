@@ -17,6 +17,8 @@ String signal_class;
 // flag to mark when the dial has been moved
 bool change_to_push = false;
 bool encoder_button_pressed = false;
+String support_message;
+
 //
 // records the state of millis() once per cycle
 // millis() == how many milliseconds since micocomputer started up
@@ -49,8 +51,8 @@ bool button_state;
 // pin 2 on rotary encoder
 #define inputDT 5
 
-    // the RotaryEncoder Library object
-    RotaryEncoder encoder(5, 4);
+// the RotaryEncoder Library object
+RotaryEncoder encoder(5, 4);
 
 // tracks absolute position of dial.
 // i.e. (all it's clockwise turns) - (all it's couterclockwise turns)

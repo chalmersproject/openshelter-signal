@@ -85,8 +85,8 @@ void occupancy_request(String push_or_pull)
         }
         occupancy = resJson["data"]["signal"]["measurements"][0]["occupancy"]["spots"].as<int>();
         capacity = resJson["data"]["signal"]["measurements"][0]["capacity"]["spots"].as<int>();
-        shelter_name = resJson["data"]["signal"]["measurements"][0]["capacity"]["spots"].as<String>();
-        signal_class = resJson["data"]["signal"]["measurements"][0]["capacity"]["spots"].as<String>();
+        shelter_name = resJson["data"]["signal"]["name"].as<String>();
+        signal_class = resJson["data"]["signal"]["measure"].as<String>();
         Serial.println(" Response occupancy: " + (String)occupancy);
         Serial.println(" Response capacity: " + (String)capacity);
     }

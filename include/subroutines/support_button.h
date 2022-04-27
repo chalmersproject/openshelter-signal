@@ -96,7 +96,8 @@ void support_button_clicked()
         Serial.println("button held for 5 seconds! SEND MESSAGE!");
         //TODO: switch screen to SENDING_FOR_SUPPORT screen
         //TODO: send telegram message to support group.
-        bot.sendMessage(CHAT_ID, "St Felix Augusta: NEED SUPPORT!", "");
+        support_message = (String)shelter_name + ": NEED SUPPORT!";
+        bot.sendMessage(CHAT_ID, support_message, "");
         telegram_message_sent = true;
         //reset time to now, so if button is still held
         button_clicked_time = now;

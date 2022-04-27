@@ -105,9 +105,4 @@ void loop()
   sync_to_cloud("push");
   sync_to_cloud("pull");
   support_button_clicked();
-
-  // push_to_cloud(now, last, client, push_wait, enable_internet, occupancy, capacity);
-  // push_to_cloud();
-  // pull_from_cloud(now, last_change_time, client, pull_wait, enable_internet, occupancy, capacity);
-  // support_button_clicked(encoder_button_pin, now, encoder_button_timer);
 }
