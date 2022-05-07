@@ -104,5 +104,15 @@ void loop()
   now = millis();
   sync_to_cloud("push");
   sync_to_cloud("pull");
-  support_button_clicked();
+  // support_button_clicked();
+
+  // call handle support button and handle return code.
+  // used to send a "need help!" message to telegram support chat
+  // 0 == function ran correctly
+  // 1 == unable to send telegram support message
+  // 2 == rotary encoder is misbehaving
+  if ( handle_support_button() == 1)
+  {
+    Serial.println("Something went wrong in handle_support_button()");
+  }
 }

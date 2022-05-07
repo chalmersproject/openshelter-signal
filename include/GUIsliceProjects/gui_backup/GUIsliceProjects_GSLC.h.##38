@@ -49,13 +49,13 @@
 // ------------------------------------------------
 //<Enum !Start!>
 enum {E_PG_MAIN,E_PG_WIFICON,E_PG_CLOUDSYNC,E_PG_SUPPORTCALL
-      ,E_PG_SUPPORTSENT,E_POP_KEYPAD_NUM};
+      ,E_POP_KEYPAD_NUM};
 enum {CAPACITY_NUM_MONITOR,E_DRAW_LINE1,E_DRAW_LINE2,E_ELEM_BOX1
-      ,E_ELEM_BOX2,E_ELEM_BOX4,E_ELEM_NUMINPUT3,E_ELEM_NUMINPUT5
-      ,E_ELEM_TEXT1,E_ELEM_TEXT10,E_ELEM_TEXT11,E_ELEM_TEXT12
-      ,E_ELEM_TEXT13,E_ELEM_TEXT14,E_ELEM_TEXT18,E_ELEM_TEXT19
-      ,E_ELEM_TEXT4,E_ELEM_TEXT5,E_ELEM_TEXT6,E_ELEM_TEXT7,E_ELEM_TEXT8
-      ,E_ELEM_TEXT9,OCCUPANCY_GAGE,E_ELEM_KEYPAD_NUM};
+      ,E_ELEM_BOX2,E_ELEM_NUMINPUT3,E_ELEM_NUMINPUT5,E_ELEM_TEXT1
+      ,E_ELEM_TEXT10,E_ELEM_TEXT11,E_ELEM_TEXT12,E_ELEM_TEXT13
+      ,E_ELEM_TEXT14,E_ELEM_TEXT4,E_ELEM_TEXT5,E_ELEM_TEXT6
+      ,E_ELEM_TEXT7,E_ELEM_TEXT8,E_ELEM_TEXT9,OCCUPANCY_GAGE
+      ,E_ELEM_KEYPAD_NUM};
 // Must use separate enum for fonts with MAX_FONT at end to use gslc_FontSet.
 enum {E_BUILTIN5X8,E_FREESANS18,E_FREESANS9,E_FREESANSBOLD9,MAX_FONT};
 //<Enum !End!>
@@ -68,7 +68,7 @@ enum {E_BUILTIN5X8,E_FREESANS18,E_FREESANS9,E_FREESANSBOLD9,MAX_FONT};
 // Define the maximum number of elements and pages
 // ------------------------------------------------
 //<ElementDefines !Start!>
-#define MAX_PAGE                6
+#define MAX_PAGE                5
 
 #define MAX_ELEM_PG_MAIN 5 // # Elems total on page
 #define MAX_ELEM_PG_MAIN_RAM MAX_ELEM_PG_MAIN // # Elems in RAM
@@ -81,9 +81,6 @@ enum {E_BUILTIN5X8,E_FREESANS18,E_FREESANS9,E_FREESANSBOLD9,MAX_FONT};
 
 #define MAX_ELEM_PG_SUPPORTCALL 4 // # Elems total on page
 #define MAX_ELEM_PG_SUPPORTCALL_RAM MAX_ELEM_PG_SUPPORTCALL // # Elems in RAM
-
-#define MAX_ELEM_PG_SUPPORTSENT 3 // # Elems total on page
-#define MAX_ELEM_PG_SUPPORTSENT_RAM MAX_ELEM_PG_SUPPORTSENT // # Elems in RAM
 //<ElementDefines !End!>
 
 // ------------------------------------------------
@@ -103,8 +100,6 @@ gslc_tsElem                     m_asPopup2Elem[MAX_ELEM_PG_CLOUDSYNC_RAM];
 gslc_tsElemRef                  m_asPopup2ElemRef[MAX_ELEM_PG_CLOUDSYNC];
 gslc_tsElem                     m_asPopup3Elem[MAX_ELEM_PG_SUPPORTCALL_RAM];
 gslc_tsElemRef                  m_asPopup3ElemRef[MAX_ELEM_PG_SUPPORTCALL];
-gslc_tsElem                     m_asPopup4Elem[MAX_ELEM_PG_SUPPORTSENT_RAM];
-gslc_tsElemRef                  m_asPopup4ElemRef[MAX_ELEM_PG_SUPPORTSENT];
 gslc_tsElem                     m_asKeypadNumElem[1];
 gslc_tsElemRef                  m_asKeypadNumElemRef[1];
 gslc_tsXKeyPad                  m_sKeyPadNum;
@@ -169,7 +164,6 @@ void InitGUIslice_gen()
   gslc_PageAdd(&m_gui,E_PG_WIFICON,m_asPopup1Elem,MAX_ELEM_PG_WIFICON_RAM,m_asPopup1ElemRef,MAX_ELEM_PG_WIFICON);
   gslc_PageAdd(&m_gui,E_PG_CLOUDSYNC,m_asPopup2Elem,MAX_ELEM_PG_CLOUDSYNC_RAM,m_asPopup2ElemRef,MAX_ELEM_PG_CLOUDSYNC);
   gslc_PageAdd(&m_gui,E_PG_SUPPORTCALL,m_asPopup3Elem,MAX_ELEM_PG_SUPPORTCALL_RAM,m_asPopup3ElemRef,MAX_ELEM_PG_SUPPORTCALL);
-  gslc_PageAdd(&m_gui,E_PG_SUPPORTSENT,m_asPopup4Elem,MAX_ELEM_PG_SUPPORTSENT_RAM,m_asPopup4ElemRef,MAX_ELEM_PG_SUPPORTSENT);
   gslc_PageAdd(&m_gui,E_POP_KEYPAD_NUM,m_asKeypadNumElem,1,m_asKeypadNumElemRef,1);  // KeyPad
 
   // NOTE: The current page defaults to the first page added. Here we explicitly
@@ -327,29 +321,6 @@ void InitGUIslice_gen()
   gslc_ElemSetClickEn(&m_gui, pElemRef, true);
   gslc_ElemSetTouchFunc(&m_gui, pElemRef, &CbBtnCommon);
   m_pElemVal2_5 = pElemRef;
-
-  // -----------------------------------
-  // PAGE: E_PG_SUPPORTSENT
-  
-   
-  // Create E_ELEM_BOX4 box
-  pElemRef = gslc_ElemCreateBox(&m_gui,E_ELEM_BOX4,E_PG_SUPPORTSENT,(gslc_tsRect){4,30,115,60});
-  gslc_ElemSetRoundEn(&m_gui, pElemRef, true);
-  gslc_ElemSetCol(&m_gui,pElemRef,GSLC_COL_GRAY_DK2,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY_LT3);
-  
-  // Create E_ELEM_TEXT18 text label
-  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT18,E_PG_SUPPORTSENT,(gslc_tsRect){16,50,91,10},
-    (char*)"SUPPORT MESSAGE",0,E_BUILTIN5X8);
-  gslc_ElemSetTxtCol(&m_gui,pElemRef,GSLC_COL_BLACK);
-  gslc_ElemSetCol(&m_gui,pElemRef,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY);
-  gslc_ElemSetTxtEnc(&m_gui,pElemRef,GSLC_TXT_ENC_UTF8);
-  
-  // Create E_ELEM_TEXT19 text label
-  pElemRef = gslc_ElemCreateTxt(&m_gui,E_ELEM_TEXT19,E_PG_SUPPORTSENT,(gslc_tsRect){46,60,31,10},
-    (char*)"SENT!",0,E_BUILTIN5X8);
-  gslc_ElemSetTxtCol(&m_gui,pElemRef,GSLC_COL_BLACK);
-  gslc_ElemSetCol(&m_gui,pElemRef,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY_LT3,GSLC_COL_GRAY);
-  gslc_ElemSetTxtEnc(&m_gui,pElemRef,GSLC_TXT_ENC_UTF8);
 
   // -----------------------------------
   // PAGE: E_POP_KEYPAD_NUM

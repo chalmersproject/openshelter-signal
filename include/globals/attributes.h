@@ -23,7 +23,10 @@ static bool has_button = true;
 // how long to wait (after the last time the dial was turned)
 int pull_wait = 70000; // 70 seconds
 int push_wait = 3000;  // 3 seconds
+
+// how long to waith until support message is sent
 int button_clicked_wait = 5000;
+int button_clicked_wait_seconds = (int)( button_clicked_wait / 1000 );
 int button_clicked_debounce = 50;
 
 #endif
