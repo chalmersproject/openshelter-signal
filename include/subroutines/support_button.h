@@ -89,6 +89,7 @@ int handle_support_button()
         // if the button was *just* pressed then as long as the button is held down
         // we will not update button_held_for, allowing it's value to drift from now
         button_clicked_time = now;
+        Serial.println("Button was *just* pressed. Starting countdown to send message");
     }
 
     // If the button is clicked, and it's last state was also clicked, how long has it been clicked?
@@ -96,7 +97,7 @@ int handle_support_button()
     {
         // record seconds since button clicked before overwriting it
         last_button_clicked_time_seconds = button_clicked_time_seconds;
-
+        Serial.println("CALACULATING HOW LONG BUTTON HAS BEEN HELD FOR");
         // first lets calculate how long the button has been held
         millis_since_click = now - button_clicked_time;
         // then we'll convert that number from millis to seconds
@@ -108,6 +109,7 @@ int handle_support_button()
         // gslc_SetPageCur calls
         if ( 200 >= millis_since_click >= 50)
         {
+            Serial.println("Button held 200millis. Starting SUPPORT CALL SCREEN");
             gslc_SetPageCur(&m_gui, E_PG_SUPPORTCALL);
             gslc_Update(&m_gui);
         }
@@ -115,13 +117,16 @@ int handle_support_button()
         // if button_clicked_time_seconds has changed, update 
         if (last_button_clicked_time_seconds != button_clicked_time_seconds)
         {
+            Serial.println("button_clicked_time_seconds HAS CHANGED");
             // here we convert button_clicked_time_seconds to button_clicked_time_countdown
             // so button_clicked_time_countdown can be printed to the display
+            Serial.println("CALCULATING COUNTDOWN NUMBER TO PRINT");
             button_clicked_time_countdown = button_clicked_wait_seconds - button_clicked_time_seconds; 
-            
+            Serial.println("COUNTDOWN TIMER =  " + (String)button_clicked_time_countdown);
             // if countdown is greater than zero, print countdown value to display
             if ( button_clicked_time_countdown > 0)
             {
+                Serial.println("PRINTING COUNTDOWN TO DISPLAY");
                 char string_to_write[MAX_STR];
                 snprintf(string_to_write, MAX_STR, "%u", button_clicked_time_countdown);
                 gslc_ElemSetTxtStr(&m_gui, m_pElemVal2_5, string_to_write);
@@ -131,29 +136,31 @@ int handle_support_button()
                 // set screen to "sending help message!" 
                 // send telegram message; 
                 // set screen to "help message sent!"
-            if ( button_clicked_time_countdown == 0 )
+            if ( 0 >= button_clicked_time_countdown )
             {
+                Serial.println("COUNTDOWN HIT 0, SHOWING SUPPORT MESSAGE");
                 // switch screen to SENDING_FOR_SUPPORT screen
                 gslc_SetPageCur(&m_gui, E_PG_SUPPORTSENT);
                 
                 // set screen to SENDING NEED HELP MESSAGE!
                 char string_to_write[MAX_STR];
-                snprintf(string_to_write, MAX_STR, "%u", "SENDING NEED HELP");
-                gslc_ElemSetTxtStr(&m_gui, m_pELEM_TEXT18, string_to_write);
-                snprintf(string_to_write, MAX_STR, "%u", "MESSAGE!");
-                gslc_ElemSetTxtStr(&m_gui, m_pELEM_TEXT19, string_to_write);
-                gslc_Update(&m_gui);
+                // snprintf(string_to_write, MAX_STR, "%u", "SENDING NEED HELP");
+                // gslc_ElemSetTxtStr(&m_gui, m_pELEM_TEXT18, string_to_write);
+                // snprintf(string_to_write, MAX_STR, "%u", "MESSAGE!");
+                // gslc_ElemSetTxtStr(&m_gui, m_pELEM_TEXT19, string_to_write);
+                // gslc_Update(&m_gui);
                 
+                Serial.println("SENDING TELEGRAM MESSAGE");
                 // send help message to telegram support group
                 support_message = (String)shelter_name + ": NEED HELP!";
                 bot.sendMessage(CHAT_ID, support_message, "");
                 
                 // set screen to HELP MESSAGE SENT!
-                snprintf(string_to_write, MAX_STR, "%u", "HELP MESSAGE");
-                gslc_ElemSetTxtStr(&m_gui, m_pELEM_TEXT18, string_to_write);
-                snprintf(string_to_write, MAX_STR, "%u", "SENT!");
-                gslc_ElemSetTxtStr(&m_gui, m_pELEM_TEXT19, string_to_write);
-                gslc_Update(&m_gui);
+                // snprintf(string_to_write, MAX_STR, "%u", "HELP MESSAGE");
+                // gslc_ElemSetTxtStr(&m_gui, m_pELEM_TEXT18, string_to_write);
+                // snprintf(string_to_write, MAX_STR, "%u", "SENT!");
+                // gslc_ElemSetTxtStr(&m_gui, m_pELEM_TEXT19, string_to_write);
+                // gslc_Update(&m_gui);
                 delay(1500);
 
                 // record that a telegram message has been sent
