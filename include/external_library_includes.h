@@ -2,6 +2,7 @@
 #define EXTERN_LIBRARY_INCLUDES_H
 
 #include <Arduino.h>
+#include <SimpleTimer.h>
 
 // display
 #include <SPI.h>

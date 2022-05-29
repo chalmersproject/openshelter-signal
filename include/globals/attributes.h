@@ -24,9 +24,13 @@ static bool has_button = true;
 int pull_wait = 70000; // 70 seconds
 int push_wait = 3000;  // 3 seconds
 
-// how long to waith until support message is sent
+// how many millis to wait until support message is sent
+int support_call_wait = 5000;
+// how many seconds to wait until support message is sent
+int support_call_wait_seconds = 5;
+
 int button_clicked_wait = 5000;
-int button_clicked_wait_seconds = (int)( button_clicked_wait / 1000 );
+int button_clicked_wait_seconds = 5;
 int button_clicked_debounce = 50;
 
 #endif

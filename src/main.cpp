@@ -111,8 +111,11 @@ void loop()
   // 0 == function ran correctly
   // 1 == unable to send telegram support message
   // 2 == rotary encoder is misbehaving
-  if ( handle_support_button() == 1)
-  {
-    Serial.println("Something went wrong in handle_support_button()");
-  }
+  // if ( handle_support_button() == 1)
+  // {
+  //   Serial.println("Something went wrong in handle_support_button()");
+  // }
+  // Serial.println("Function handle support button has exited");
+
+  handle_support_button_timer();
 }

@@ -62,17 +62,18 @@ int handle_support_button()
     // overwriting it with it's current state
     last_button_state = button_state;
     button_state = digitalRead(button_pin);
-
+    // Serial.println("Button STATE = " + (String)button_state);
     // is the button pressed?
-    if ( button_state == false)
+    if ( button_state == HIGH ) // (HIGH means not pressed)
     {
         // if button is not pressed, exit to main loop without error
         telegram_message_sent = false; // but first make sure telegram_message_sent is reset
+        // Serial.println("Button is not pressed, returning from handle support button");
         return 0;
     }
 
     // if the button is pressed, was the telegram message sent already?
-    if ( button_state && telegram_message_sent )
+    if ( (button_state == LOW) && telegram_message_sent )
     {   
         // if telegram message was sent already exit to main loop 
             // we only want to send one telegram message per "button pressed event"
@@ -84,7 +85,7 @@ int handle_support_button()
     }
 
     // if the button is pressed, was the last state of the button unpressed?
-    if ( button_state && last_button_state == false )
+    if ( (button_state == LOW) && (last_button_state == HIGH) )
     {
         // if the button was *just* pressed then as long as the button is held down
         // we will not update button_held_for, allowing it's value to drift from now
@@ -93,7 +94,7 @@ int handle_support_button()
     }
 
     // If the button is clicked, and it's last state was also clicked, how long has it been clicked?
-    if ( button_state && last_button_state )
+    if ( (button_state == LOW) && (last_button_state == LOW) )
     {
         // record seconds since button clicked before overwriting it
         last_button_clicked_time_seconds = button_clicked_time_seconds;
@@ -122,7 +123,9 @@ int handle_support_button()
             // so button_clicked_time_countdown can be printed to the display
             Serial.println("CALCULATING COUNTDOWN NUMBER TO PRINT");
             button_clicked_time_countdown = button_clicked_wait_seconds - button_clicked_time_seconds; 
-            Serial.println("COUNTDOWN TIMER =  " + (String)button_clicked_time_countdown);
+            Serial.println("button_clicked_time_countdown = " + (String)button_clicked_time_countdown);
+            Serial.println("button_clicked_time_countdown = " + (String)button_clicked_wait_seconds);
+            Serial.println("button_clicked_wait_seconds   = " + (String)button_clicked_wait_seconds);
             // if countdown is greater than zero, print countdown value to display
             if ( button_clicked_time_countdown > 0)
             {
@@ -136,7 +139,8 @@ int handle_support_button()
                 // set screen to "sending help message!" 
                 // send telegram message; 
                 // set screen to "help message sent!"
-            if ( 0 >= button_clicked_time_countdown )
+            Serial.println("button_clicked_time_countdown = " + (String)button_clicked_time_countdown);
+            if ( button_clicked_time_countdown < 0 )
             {
                 Serial.println("COUNTDOWN HIT 0, SHOWING SUPPORT MESSAGE");
                 // switch screen to SENDING_FOR_SUPPORT screen
@@ -171,6 +175,71 @@ int handle_support_button()
         }
     }
 }
+
+void call_for_support()
+{
+    Serial.println("SENDING TELEGRAM MESSAGE");
+    // send help message to telegram support group
+    support_message = (String)shelter_name + ": NEED HELP!";
+    bot.sendMessage(CHAT_ID, support_message, "");
+}
+
+void update_guislice_countdown(int countdown)
+{
+    Serial.println("SWITCHING TO GUISLICE SUPPORT CALL SCREEN");
+    gslc_SetPageCur(&m_gui, E_PG_SUPPORTCALL);
+    // update number on guislice countdown screen
+    char string_to_write[MAX_STR];
+    snprintf(string_to_write, MAX_STR, "%u", countdown);
+    gslc_ElemSetTxtStr(&m_gui, m_pElemVal2_5, string_to_write);
+    gslc_Update(&m_gui);
+}
+
+// coundown from 5 seconds
+// then send out a support message
+int countdown = 5;
+void support_call_countdown()
+{
+    update_guislice_countdown(countdown);
+    if ( countdown > 0)
+    {
+        countdown--;
+    } else {
+        Serial.println("COUNTDOWN HIT 0");   
+        call_for_support();
+        // after calling for support we reset these flags
+        // so support is only called once per button push
+        countdown = 5;
+        telegram_message_sent = true;
+    }
+}
+// create variable to store support_call_timer
+int support_call_timer;
+
+// if button is clicked start timer
+// check if telegram_message_sent has been reset by releasing button
+void handle_support_button_timer(){
+    support_call_timer = timer.setInterval(1000, support_call_countdown);
+    button_state = digitalRead(button_pin);
+    if ( (button_state == LOW) && (telegram_message_sent == false) ) // (LOW means pressed)
+    {
+        Serial.println("BUTTON CLICKED!");   
+        Serial.println("support_call_timer ID : " + (String)support_call_timer);   
+        timer.enable(support_call_timer);
+        // support_call_timer = timer.setTimeout(support_call_wait, call_for_support);
+    } else if ( button_state == HIGH ) // HIGH means released
+    {
+        // if button is released make sure 
+        //      support_call_timer is reset and disabled
+        //      telegram_message_sent is reset
+        timer.disable(support_call_timer);
+        telegram_message_sent == false;
+        // timer.restartTimer(support_call_timer);
+    }
+
+}
+
+
 
 // void support_button_clicked()
 // {
