@@ -2,7 +2,6 @@
 #define EXTERN_LIBRARY_INCLUDES_H
 
 #include <Arduino.h>
-#include <SimpleTimer.h>
 
 // display
 #include <SPI.h>
@@ -27,4 +26,8 @@
 #include "GUIsliceProjects/GUIsliceProjects_GSLC.h"
 #include "guislice_init.h"
 #include "guislice_callbacks.h"
+
+
+#include <SimpleUtils.h>
+#include <SimpleTimer.h> 
 #endif
