@@ -57,7 +57,7 @@ void setup()
 
 void loop()
 {
-
+  now = millis();
   // Serial.println("CHECKING POSITION OF DIAL");
   int newPos = encoder.getPosition();
   if (pos != newPos)
@@ -101,21 +101,9 @@ void loop()
   //
   // wait at least 3 seconds since last change before pushing to api.chalmers.project
   //
-  now = millis();
   sync_to_cloud("push");
   sync_to_cloud("pull");
-  // support_button_clicked();
-
-  // call handle support button and handle return code.
-  // used to send a "need help!" message to telegram support chat
-  // 0 == function ran correctly
-  // 1 == unable to send telegram support message
-  // 2 == rotary encoder is misbehaving
-  // if ( handle_support_button() == 1)
-  // {
-  //   Serial.println("Something went wrong in handle_support_button()");
-  // }
-  // Serial.println("Function handle support button has exited");
-
   handle_support_button_timer();
+  
+  yield();
 }
