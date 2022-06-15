@@ -34,10 +34,23 @@ unsigned long last_change_time = pull_wait;
 
 //
 // timer that records how long since the encoder's click-y button was pressed
-unsigned long button_clicked_time;
+unsigned long button_clicked_time, millis_since_click;
+// True when rotary encoder button is pushed
 bool button_pushed;
-bool last_button_state;
+// Current state of rotary encoder button. True when rotary encoder button is pressed.
 bool button_state;
+// the last state of the rotary encoder 
+bool last_button_state;
+bool countdown_start;
+// flag to track if support message was just sent
+// used to reset back to "START SEND FOR HELP SCREEN" incase 
+// user holds down the button after countdown completes and
+// support message is sent
+bool telegram_message_sent = false;
+// used to calculate how many seconds button has been held for
+int button_clicked_time_seconds, last_button_clicked_time_seconds, button_clicked_time_countdown;
+
+
 //
 // Rotary Encoder Global Variables
 //

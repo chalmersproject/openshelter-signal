@@ -20,4 +20,6 @@ void init_interrupts()
     pinMode(button_pin, INPUT_PULLUP);
     // attachInterrupt(digitalPinToInterrupt(encoder_button_pin), encoder_button_trigger, ONLOW);
 }
+SimpleTimer timer;
+
 #endif

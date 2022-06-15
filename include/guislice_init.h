@@ -1,6 +1,8 @@
 // Save some element references for direct access
 //<Save_References !Start!>
 gslc_tsElemRef *m_pELEM_TEXT1 = NULL;
+gslc_tsElemRef *m_pELEM_TEXT18 = NULL;
+gslc_tsElemRef *m_pELEM_TEXT19 = NULL;
 gslc_tsElemRef *m_pElemVal2 = NULL;
 gslc_tsElemRef *m_pElemVal2_3 = NULL;
 gslc_tsElemRef *m_pElemVal2_5 = NULL;

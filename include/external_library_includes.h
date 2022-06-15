@@ -26,4 +26,8 @@
 #include "GUIsliceProjects/GUIsliceProjects_GSLC.h"
 #include "guislice_init.h"
 #include "guislice_callbacks.h"
+
+
+#include <SimpleUtils.h>
+#include <SimpleTimer.h> 
 #endif

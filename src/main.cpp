@@ -57,7 +57,7 @@ void setup()
 
 void loop()
 {
-
+  now = millis();
   // Serial.println("CHECKING POSITION OF DIAL");
   int newPos = encoder.getPosition();
   if (pos != newPos)
@@ -101,8 +101,9 @@ void loop()
   //
   // wait at least 3 seconds since last change before pushing to api.chalmers.project
   //
-  now = millis();
   sync_to_cloud("push");
   sync_to_cloud("pull");
-  support_button_clicked();
+  handle_support_button_timer();
+  
+  yield();
 }

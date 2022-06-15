@@ -6,127 +6,95 @@
 #include <globals/attributes.h>
 #include <subroutines/telegram_init_and_send.h>
 
-bool countdown_start;
-// flag to track if support message was just sent
-// used to reset back to "START SEND FOR HELP SCREEN" incase 
-// user holds down the button after countdown completes and
-// support message is sent
-bool telegram_message_sent = false;
 
-// used to calculate how many seconds button has been held for
-int button_clicked_time_seconds, last_button_clicked_time_seconds, button_clicked_time_countdown;
-void support_button_clicked()
+/*
+## What this is
+Function to handle when the rotary encoder's button gets clicked. When it gets clicked and held for button_clicked_wait milliseconds the chalmers signal will send out a "Need Help from this Shelter!" message to a telegram group of Chalmers Project members. A member will then need to visit the shelter the support message came from and find out what they needed help with!
+*/
+int countdown = support_call_wait_seconds;
+void call_for_support();
+void update_guislice_countdown();
+// if button is clicked start timer
+// check if telegram_message_sent has been reset by releasing button
+// SetTimer( countdown_timer,  1000 , update_guislice_countdown);
+
+static SimpleTimer support_timer(support_call_wait,call_for_support);
+static SimpleTimer countdown_timer(1000,update_guislice_countdown); 
+
+void report_status_telegram()
 {
-    last_button_state = button_state;
+    Serial.println("telegram message sent?: " + (String)telegram_message_sent );
+}
+void report_status_button()
+{
+    Serial.println("Button State: " + (String) button_state) ;
+}
+void handle_support_button_timer(){
     button_state = digitalRead(button_pin);
-
-    // button is HIGH when released
-    if (button_state == HIGH)
-    {
-        //while button released, keep button_clicked_time in sync with now
-        button_clicked_time = now;
-        telegram_message_sent = false;
-    }
-    //if button is pressed, allow button_clicked_time to start to drift from now
-    if ((button_state == LOW) && (last_button_state == HIGH))
-    { 
-        Serial.println("begin drifting button_clicked_time and now");
-    }
-    // while button is held down, calculate how many seconds it has been held for
-    if (button_state == LOW)
-    {
-        // so long as button is pushed, keep last_change_time synced with now
-        // to prevent push or pull to cloud happening while support button is pushed
+    SetTimer( report_button_state_timer, 1000, report_status_telegram);
+    SetTimer( report_telegram_message_sent_timer, 1000, report_status_button);
+    // LOW means pressed; HIGH means released
+    if ( (button_state == LOW) && (telegram_message_sent == false) ) 
+    {   
+        // every one second button is held down, update the countdown on GuiSlice
+        countdown_timer.check();
+        support_timer.check();
+        
+        // reset global push timer
         last_change_time = now;
-        // record the number of seconds since button was pressed
-        // num of seconds button has been clicked is equal to the difference in time
-        // between now and button_clicked_time
-        // then we convert button_clicked_time_seconds from millis to seconds, rounding up
-        // button_clicked_time_seconds = (int)round((now - button_clicked_time/1000));
-        button_clicked_time_seconds = (int)( (now - button_clicked_time) / 1000 );
-
-        // Serial.println("Button Clicked Seconds CURRENT: " + (String)button_clicked_time_seconds);
-        // Serial.println("last_button_seconds:          " + (String)last_button_clicked_time_seconds);
-        // Serial.println("button_clicked_time_seconds: " + (String)button_clicked_time_seconds);
-        // if num of seconds has changed since the last time we checked, 
-        // update guiSlice countdown button
-        if (button_clicked_time_seconds != last_button_clicked_time_seconds)
-        {
-            
-            Serial.println("Button Clicked Seconds: " + (String)button_clicked_time_seconds);
-            button_clicked_time_countdown = (int)(button_clicked_wait/1000) - button_clicked_time_seconds;
-            char string_to_write[MAX_STR];
-            snprintf(string_to_write, MAX_STR, "%u", button_clicked_time_countdown);
-            gslc_ElemSetTxtStr(&m_gui, m_pElemVal2_5, string_to_write);
-            gslc_Update(&m_gui);
-            // last_button_clicked_time_seconds = button_clicked_time_seconds;
-        }
-        // reset last_button_clicked_time_seconds to current button_clicked_time_seconds
-        // to prepare for the next time we check
-        last_button_clicked_time_seconds = button_clicked_time_seconds;
-    }
-    // if button has been held down length button_clicked_debounce
-    // or if button is being held down and telegram message was *just sent*
-    // set screen to "CALLING FOR HELP COUNTDOWN" screen
-    if (
-        // TODO: these debounces & flags are getting unruly
-        // For now I'll just rely on that the guislice calls will naturally introduce a debounce
-        // but eventually I should move to some kind of scheduler/timer library.
-        // (button_state == LOW) && (( now - button_clicked_time ) >= button_clicked_debounce ) || 
-        (button_state == LOW) && (last_button_state == HIGH) || 
-        (button_state == LOW) && (last_button_state == LOW) && ( telegram_message_sent )
-        )
-    {
-        Serial.println("ENCODER BUTTON PRESSED");
-        Serial.println("START SEND FOR HELP SCREEN");
-        gslc_SetPageCur(&m_gui, E_PG_SUPPORTCALL);
-        gslc_Update(&m_gui);
-        telegram_message_sent = false;
-    } //when button is released, return screen to standard display
-    else if ((button_state == HIGH) && (last_button_state == LOW))
-    {
-        Serial.println("ENCODER BUTTON RELEASED!");
+    } else if (telegram_message_sent == true || button_state == HIGH)
+    {   
+        // once telegram message is sent or button is released
+        // countdown_timer, support_timer is reset
+        // countdown is reset
+        // guislice is reset back to main screen
+        countdown_timer.reset();
+        support_timer.reset();
+        countdown = support_call_wait_seconds;
         gslc_SetPageCur(&m_gui, E_PG_MAIN);
         gslc_Update(&m_gui);
-        button_clicked_time = now;
-    }
-
-    if ((now - button_clicked_time) >= button_clicked_wait)
+    } 
+    // telegram_message_sent is reset once button is released 
+    if (button_state == HIGH)
     {
-        Serial.println("button held for 5 seconds! SEND MESSAGE!");
-        //TODO: switch screen to SENDING_FOR_SUPPORT screen
-        //TODO: send telegram message to support group.
-        support_message = (String)shelter_name + ": NEED SUPPORT!";
-        bot.sendMessage(CHAT_ID, support_message, "");
-        telegram_message_sent = true;
-        //reset time to now, so if button is still held
-        button_clicked_time = now;
+        telegram_message_sent = false;
     }
-    // if button has been held for button_clicked_wait milliseconds
-    // send
+}
+void call_for_support()
+{
+    Serial.println("SENDING TELEGRAM MESSAGE");
+    
+    support_message = (String)shelter_name + ": NEED HELP!";
+    
+    // if internet is enabled, send message
+    // else just delay for 1 second to simulate
+    if (enable_internet)
+    {
+        // send help message to telegram support group
+        bot.sendMessage(CHAT_ID, support_message, "");
+    } else 
+    {
+        delay(1500);
+    }
+    telegram_message_sent = true;
+    
+    // we reset the timer here as well to account for the amount of time it takes
+    // to send the telegram message
+    support_timer.reset();
 
-    // encoder timer starts at zero, so the first time the button is
-    // pressed (now - button_clicked_timer) will likely trigger all the
-    // below if statements.
-    // to combat that I've created this flag which becomes true at the
-    // start of this method, and becomes false once it's completed its
-    // full run
-    // if (countdown_start == false)
-    // {
-    //     countdown_start = true;
-    // }
+    // we also update the global "change found that needs to be pushed to api" timer
+    last_change_time = now;
+}
 
-    // // trigger support countdown screen after
-    // // 200 millis of button being held down
-    // if (now - button_clicked_time >= button_clicked_wait)
-    // {
-    //     Serial.println("Initiating call for support countdown!");
-    //     gslc_SetPageCur(&m_gui, E_PG_MAIN);
-    //     gslc_Update(&m_gui);
-    // }
-
-    // if button is pressed, but support message was sent <2000millis ago
-    // return to main page
-    // set 10 second wait before support can be called again
+void update_guislice_countdown()
+{
+    gslc_SetPageCur(&m_gui, E_PG_SUPPORTCALL);
+    // update number on guislice countdown screen
+    char string_to_write[MAX_STR];
+    snprintf(string_to_write, MAX_STR, "%u", countdown);
+    gslc_ElemSetTxtStr(&m_gui, m_pElemVal2_5, string_to_write);
+    gslc_Update(&m_gui);
+    Serial.println("countdown: " + (String)countdown);
+    countdown--;
 }
 #endif
