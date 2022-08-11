@@ -103,7 +103,15 @@ void loop()
   //
   sync_to_cloud("push");
   sync_to_cloud("pull");
-  handle_support_button_timer();
+
+  //
+  // these timers are causing the chalmers signal to crash
+  // when the dial gets turned sometimes
+  // I think there's some conflict in interrupts between
+  // the rotary encoder interrupts and the 
+  // timer library interrupts
+  
+  // handle_support_button_timer();
   
   yield();
 }
