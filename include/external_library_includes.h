@@ -21,6 +21,7 @@
 
 // LED
 #include <FastLED.h>
+#include <Adafruit_NeoPixel.h>
 
 // GUISlice
 #include "GUIsliceProjects/GUIsliceProjects_GSLC.h"
@@ -30,4 +31,5 @@
 
 // #include <SimpleUtils.h>
 // #include <SimpleTimer.h> 
+
 #endif

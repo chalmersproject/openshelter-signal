@@ -23,7 +23,7 @@ F/OSS under M.I.T License
 #include "subroutines/update_guislice.h"
 #include "subroutines/led_init_and_update.h"
 #include "subroutines/telegram_init_and_send.h"
-#include "subroutines/support_button.h"
+// #include "subroutines/support_button.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //                    Rotary Encoder Interrupt                                           //
@@ -113,5 +113,5 @@ void loop()
   
   // handle_support_button_timer();
   
-  yield();
+  // yield();
 }

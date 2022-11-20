@@ -79,6 +79,7 @@ int hue = 0;
 uint32 led_last;
 #define NUM_LEDS 8
 #define DATA_PIN 15
+#define LED_DATA_PIN 15
 CRGB leds[NUM_LEDS];
 int led_brightness = 32;
 
