@@ -20,6 +20,14 @@ void update_LEDs()
 {
     hue = map(occupancy, 0, capacity, 90, 0);
     CHSV color = CHSV(hue, 255, 255);
+
+    //
+    // there's a bug where the first LED in an array will not be set to the correct color 
+    // on the first write.
+    // As a shitty workaround, we simply write to all LEDs twice.
+    //
+    fill_solid(leds, NUM_LEDS, color);
+    FastLED.show();
     fill_solid(leds, NUM_LEDS, color);
     FastLED.show();
     change_to_push = true;
