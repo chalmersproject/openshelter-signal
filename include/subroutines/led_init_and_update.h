@@ -2,32 +2,38 @@
 #ifndef LED_INIT_AND_UPDATE_H
 #define LED_INIT_AND_UPDATE_H
 
+// This function takes occupancy, capacity as input
+// As output it fills an array of occupancy/capacity 
+// mapped green -> red as an rgb value
 int map_color(int * rgb_array, int occupancy, int capacity)
 {
     // LED ring takes argument Color which is tuple ( (r,g,b), a) values
+    int red,green,blue;
 
-    // This function takes occupancy, capacity as input
-    // As output it fills an array of occupancy/capacity 
-    // mapped green -> red as an rgb value
+    // ensure we avoid a divide by 0 error
+    if (0 > capacity)
+    {
+        capacity = 1;
+    }
     
     // map occupancy value to 0-255 such that
     // as occupancy moves further from capacity and closer to 0
     // green moves closer from 0 to 255
-    int green = map(occupancy, capacity, 0,  0, 255);
+    green = map(occupancy, capacity, 0,  0, 255);
 
     // do the same operation, but in reverse, for red value
-    int red = map(occupancy, 0, capacity, 0, 255);
+    red = map(occupancy, 0, capacity, 0, 255);
 
     rgb_array[0] = red;
     rgb_array[1] = green;
-    rgb_array[2] = 0;
+    rgb_array[2] = blue;
 }
 
 void init_LEDs()
 {
     // UNUSED FastLED library bindings
-    FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
-    FastLED.setBrightness(led_brightness);
+    // FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
+    // FastLED.setBrightness(led_brightness);
     
     //
     // Instatiate Adafruit Neopixel Class
@@ -44,14 +50,15 @@ void init_LEDs()
     // CHSV color = CHSV(hue, 255, 255);
     // fill_solid(leds, NUM_LEDS, color);
     // FastLED.show();
+    yield();
 }
 
 void update_LEDs()
 {
-    hue = map(occupancy, 0, capacity, 90, 0);
-    CHSV color = CHSV(hue, 255, 255);
-    fill_solid(leds, NUM_LEDS, color);
-    FastLED.show();
+    // hue = map(occupancy, 0, capacity, 90, 0);
+    // CHSV color = CHSV(hue, 255, 255);
+    // fill_solid(leds, NUM_LEDS, color);
+    // FastLED.show();
     change_to_push = true;
 }
 
