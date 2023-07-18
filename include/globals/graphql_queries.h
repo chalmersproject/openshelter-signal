@@ -5,21 +5,35 @@
 const char *PUSH = "               \
 mutation CreateSignalMeasurement(  \
   $signalId: ID!                   \
-  $signalSecret: String!           \
-  $measurement: Int!               \
-) {                                \
-  createSignalMeasurement(         \
+  $secretKey: String!              \
+  $value: Int!                     \
+  ){                               \
+  createShelterMeasurement(        \
     input: {                       \
-      signalId: $signalId          \
-      signalSecret: $signalSecret  \
-      measurement: $measurement    \
-    }                              \
+      signalId: $signalId,         \
+      secretKey: $signalSecret,    \
+      value: $measurement          \
+      }                            \
   ) {                              \
-    measurement {                  \
+    shelterMeasurement {           \
       id                           \
+      value                        \
     }                              \
+    errors                         \
   }                                \
 }";
+
+const char *PULL = R"PULL(
+query CheckSignalMeasurement(
+  $id: ID!
+  ) {
+  shelterSignalMeasurementLast(id: $signalId){
+    id
+    value
+    type
+  }
+}
+)PULL";
 
 const char *PULL = "               \
 query CheckSignalMeasurement(      \

@@ -17,7 +17,7 @@
 #define VARBUFF_SIZE 256
 #define RESPBUFF_SIZE 2048
 
-const char *_API_HOST = "https://api.cloud.chalmersproject.com/graphql";
+const char *_API_HOST = "https://openshelter.fly.dev/graphql";
 
 void occupancy_request(String push_or_pull)
 {

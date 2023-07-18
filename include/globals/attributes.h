@@ -13,7 +13,7 @@ static int display_color = 1; //(blue_pcb = 1; red_pcb = 2)
 static bool enable_internet = false;
 
 // earlier versions of chalmers signals don't have their button attached to the ESP. It's useful to be able to quickly turn off all features of the chalmers signal that use this button.
-static bool has_button = true;
+static bool has_button = false;
 
 //
 // Sync timer delays
