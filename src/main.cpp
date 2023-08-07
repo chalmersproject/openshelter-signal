@@ -46,7 +46,8 @@ void setup()
   if (enable_internet == true)
   {
     connect_to_wifi();
-    sync_to_cloud("pull");
+    perform_sync("pull");
+    sync_to_cloud("update_params");
   }
   init_LEDs();
   gslc_SetPageCur(&m_gui, E_PG_MAIN);
@@ -62,9 +63,9 @@ void loop()
   int newPos = encoder.getPosition();
   if (pos != newPos)
   {
-    Serial.print("Pos: ");
-    Serial.print(newPos);
-    Serial.println();
+    // Serial.print("Pos: ");
+    // Serial.print(newPos);
+    // Serial.println();
     if (pos > newPos)
     {
       occupancy--;
@@ -108,10 +109,10 @@ void loop()
   // these timers are causing the chalmers signal to crash
   // when the dial gets turned sometimes
   // I think there's some conflict in interrupts between
-  // the rotary encoder interrupts and the 
+  // the rotary encoder interrupts and the
   // timer library interrupts
-  
+
   // handle_support_button_timer();
-  
-  yield();
+
+  // yield();
 }

@@ -11,9 +11,16 @@ int last_occupancy = 0;
 // the shelter's total amount of space for clients, either
 // sitting space or bed space.
 int capacity = 100;
+int capacity_headcount = 100;
+int capacity_bedcount = 100;
 
+// the name of the shelter this signal is registered to.
 String shelter_name;
+// type of signal -- "class" is used by GUISlice -- instead of "type"
 String signal_class;
+// type of signal -- "type" is used by openshelter webservice -- instead of "class"
+String signal_type;
+
 // flag to mark when the dial has been moved
 bool change_to_push = false;
 bool encoder_button_pressed = false;
@@ -39,17 +46,16 @@ unsigned long button_clicked_time, millis_since_click;
 bool button_pushed;
 // Current state of rotary encoder button. True when rotary encoder button is pressed.
 bool button_state;
-// the last state of the rotary encoder 
+// the last state of the rotary encoder
 bool last_button_state;
 bool countdown_start;
 // flag to track if support message was just sent
-// used to reset back to "START SEND FOR HELP SCREEN" incase 
+// used to reset back to "START SEND FOR HELP SCREEN" incase
 // user holds down the button after countdown completes and
 // support message is sent
 bool telegram_message_sent = false;
 // used to calculate how many seconds button has been held for
 int button_clicked_time_seconds, last_button_clicked_time_seconds, button_clicked_time_countdown;
-
 
 //
 // Rotary Encoder Global Variables

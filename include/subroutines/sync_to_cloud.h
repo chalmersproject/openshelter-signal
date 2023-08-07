@@ -68,6 +68,15 @@ void perform_sync(String sync_direction)
 }
 void sync_to_cloud(String sync_direction)
 {
+
+  if (sync_direction == "update_params")
+  {
+    perform_sync(sync_direction);
+    Serial.println("  OCCUPANCY   : " + (String)occupancy);
+    Serial.println("  CAPACITY    : " + (String)capacity);
+    Serial.println("  SIGNAL_TYPE : " + (String)signal_type);
+    return;
+  }
   // depending on if pushing or pulling determine how long sync_wait should be
   // values of push_wait & pull_wait are set in include/globals/attributes.h
   int sync_wait = (sync_direction == "push") ? push_wait : pull_wait;
@@ -84,8 +93,9 @@ void sync_to_cloud(String sync_direction)
     {
       Serial.println("making a pull from api!");
       perform_sync(sync_direction);
-      Serial.println("  OCCUPANCY: " + (String)occupancy);
-      Serial.println("  CAPACITY : " + (String)capacity);
+      Serial.println("  OCCUPANCY   : " + (String)occupancy);
+      Serial.println("  CAPACITY    : " + (String)capacity);
+      Serial.println("  SIGNAL_TYPE : " + (String)signal_type);
       update_all_GSlice_UI();
     }
   }
