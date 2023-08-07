@@ -1,18 +1,16 @@
 #ifndef GRAPHQL_H
 #define GRAPHQL_H
 
-// Attempting to do a multi-line variable declaration: HOWTO?
-
 const char *PUSH = R"PUSH(
 mutation CreateSignalMeasurement(
   $signalId: ID!
   $secretKey: String!
-  $value: Int!
+  $measurement: Int!
   ){
   createShelterMeasurement(
     input: {
       signalId: $signalId,       
-      secretKey: $signalSecret,    
+      secretKey: $secretKey,    
       value: $measurement 
     }
   ) {
@@ -27,7 +25,7 @@ mutation CreateSignalMeasurement(
 
 const char *PULL = R"PULL(
 query CheckSignalMeasurement(
-  $id: ID!
+  $signalId: ID!
   ) {
   shelterSignalMeasurementLast(id: $signalId){
     id
@@ -36,5 +34,19 @@ query CheckSignalMeasurement(
   }
 }
 )PULL";
+
+const char *UPDATE_PARAMETERS = R"PARAMS(
+query ShelterFromSignalId(
+  $signalId: ID!
+){
+  shelterFromSignalId(id: $signalId )
+  {
+    id
+    name
+    maxHeadcount
+    maxBedcount
+  }
+}
+)PARAMS";
 
 #endif
