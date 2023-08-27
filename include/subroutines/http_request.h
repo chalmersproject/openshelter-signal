@@ -69,21 +69,22 @@ void occupancy_request(String push_or_pull)
 
     // Serial.print("REQUEST: ");
     // Serial.println(request);
+    if (enable_internet)
+    {
+        int responseStatus = http.POST(request);
 
-    int responseStatus = http.POST(request);
-
-    // TODO: scope these to debug output
-    Serial.print("RESPONSE STATUS: ");
-    Serial.println(responseStatus);
-    Serial.print("RESPONSE: ");
-    Serial.println(http.getString());
-
+        // TODO: scope these to debug output
+        Serial.print("RESPONSE STATUS: ");
+        Serial.println(responseStatus);
+        Serial.print("RESPONSE: ");
+        Serial.println(http.getString());
+    }
     //
     // if we're *pulling data from* chalmers signal api
     // we need this next block of code
     // it handles recieving the json message from the api
     // and pulling the occupancy and capacity values out of it
-    if (push_or_pull == "pull")
+    if (push_or_pull == "pull" && enable_internet)
     {
         Serial.println(http.getString());
         DeserializationError error = deserializeJson(resJson, http.getString());
@@ -101,7 +102,7 @@ void occupancy_request(String push_or_pull)
         Serial.println(" Response occupancy: " + (String)occupancy);
         Serial.println(" Response capacity: " + (String)capacity);
     }
-    if (push_or_pull == "update_params")
+    if (push_or_pull == "update_params" && enable_internet)
     {
         Serial.println(http.getString());
         DeserializationError error = deserializeJson(resJson, http.getString());

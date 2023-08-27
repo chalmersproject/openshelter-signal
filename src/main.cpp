@@ -98,7 +98,6 @@ void loop()
     last_occupancy = occupancy;
     change_to_push = true;
   }
-
   //
   // wait at least 3 seconds since last change before pushing to api.chalmers.project
   //
